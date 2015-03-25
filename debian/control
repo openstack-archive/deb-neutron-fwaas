@@ -1,0 +1,92 @@
+Source: neutron-fwaas
+Section: net
+Priority: optional
+Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
+Uploaders: Thomas Goirand <zigo@debian.org>
+Build-Depends: debhelper (>= 9),
+               dh-python,
+               dh-systemd,
+               openstack-pkg-tools (>= 22~),
+               po-debconf,
+               python-all (>= 2.6),
+               python-pbr,
+               python-sphinx (>= 1.2.1)
+Build-Depends-Indep: alembic (>= 0.7.2),
+                     python-cliff (>= 1.7.0),
+                     python-coverage (>= 3.6),
+                     python-eventlet (>= 0.16.1),
+                     python-fixtures (>= 0.3.14),
+                     python-hacking,
+                     python-httplib2 (>= 0.7.5),
+                     python-mock (>= 1.0),
+                     python-mysqldb,
+                     python-netaddr (>= 0.7.12),
+                     python-oslo.concurrency (>= 1.4.1),
+                     python-oslo.config (>= 1.9.0),
+                     python-oslo.db (>= 1.5.0),
+                     python-oslo.log (>= 0.4.0),
+                     python-oslo.messaging (>= 1.6.0),
+                     python-oslo.serialization (>= 1.2.0),
+                     python-oslo.utils (>= 1.2.0),
+                     python-oslosphinx (>= 2.2.0.0),
+                     python-oslotest (>= 1.2.0),
+                     python-psycopg2,
+                     python-requests-mock (>= 0.5.1),
+                     python-six (>= 1.9.0),
+                     python-sqlalchemy (>= 0.9.7),
+                     python-testscenarios (>= 0.4),
+                     python-testtools (>= 0.9.36),
+                     python-webob (>= 1.2.3),
+                     python-webtest (>= 2.0),
+                     subunit (>= 0.0.18),
+                     testrepository (>= 0.0.18)
+Standards-Version: 3.9.6
+Homepage: http://github.com/openstack/neutron-fwaas
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/neutron-fwaas.git;a=summary
+Vcs-Git: git://anonscm.debian.org/openstack/neutron-fwaas.git
+
+Package: python-neutron-fwaas
+Architecture: all
+Section: python
+Pre-Depends: dpkg (>= 1.15.6~)
+Depends: alembic (>= 0.7.2),
+         python-eventlet (>= 0.16.1),
+         python-httplib2 (>= 0.7.5),
+         python-netaddr (>= 0.7.12),
+         python-oslo.config (>= 1.9.0),
+         python-oslo.db (>= 1.5.0),
+         python-oslo.log (>= 0.4.0),
+         python-oslo.messaging (>= 1.6.0),
+         python-oslo.serialization (>= 1.2.0),
+         python-oslo.utils (>= 1.2.0),
+         python-six (>= 1.9.0),
+         python-sqlalchemy (>= 0.9.7),
+         ${misc:Depends},
+         ${python:Depends}
+Recommends: iputils-arping
+Provides: ${python:Provides}
+Description: OpenStack Firewall as a Service - Python library
+ Neutron provides an API to dynamically request and configure virtual networks.
+ These networks connect "interfaces" from other OpenStack services (such as
+ vNICs from Nova VMs). The Neutron API supports extensions to provide advanced
+ network capabilities, including QoS, ACLs, and network monitoring.
+ .
+ This package provides the Python library for the Firewall as a Service agent.
+
+Package: neutron-fwaas-agent
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Depends: adduser,
+         debconf,
+         lsb-base,
+         neutron-common,
+         ${misc:Depends},
+         ${python:Depends},
+         ${shlibs:Depends}
+Description: OpenStack Firewall as a Service - fwass agent
+ Neutron provides an API to dynamically request and configure virtual networks.
+ These networks connect "interfaces" from other OpenStack services (such as
+ vNICs from Nova VMs). The Neutron API supports extensions to provide advanced
+ network capabilities, including QoS, ACLs, and network monitoring.
+ .
+ This package provides the FWaaS agent.
