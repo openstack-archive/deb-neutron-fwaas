@@ -11,7 +11,7 @@ PYTHONS:=$(shell pyversions -vr)
 	dh $@ --buildsystem=python_distutils --with python2,systemd
 
 override_dh_install:
-	dh_install -O--buildsystem=python_distutils --fail-missing
+	dh_install -O--buildsystem=python_distutils --fail-missing -Xusr/etc/neutron/fwaas_driver.ini
 
 override_dh_auto_test:
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
