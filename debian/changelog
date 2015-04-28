@@ -1,5 +1,5 @@
-neutron-fwaas (2015.1~rc1-1) UNRELEASED; urgency=medium
+neutron-fwaas (2015.1~rc1-1) unstable; urgency=medium
 
-  * Initial release. (Closes: #XXXXXX)
+  * Initial release. (Closes: #783590)
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 26 Mar 2015 01:13:07 +0100
