@@ -1,1 +1,2 @@
 /usr/lib/python*
+usr/etc/neutron/fwaas_driver.ini	/etc/neutron

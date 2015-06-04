@@ -2,6 +2,8 @@ neutron-fwaas (2015.1.0-2) unstable; urgency=medium
 
   * Added --fail-missing for dh_install to avoid possible mistakes.
   * Packaging usr/etc/neutron/fwaas_driver.ini in /etc/neutron.
+  * Removed the neutron-fwaas-agent package alltogether, as in fact, there's no
+    specific agent. This source package is only a new lib for the l3 agent.
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 04 Jun 2015 16:00:26 +0200
 

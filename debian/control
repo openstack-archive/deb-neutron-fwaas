@@ -5,7 +5,6 @@ Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
 Uploaders: Thomas Goirand <zigo@debian.org>
 Build-Depends: debhelper (>= 9),
                dh-python,
-               dh-systemd,
                openstack-pkg-tools (>= 23~),
                python-all,
                python-pbr,
@@ -73,21 +72,3 @@ Description: OpenStack Firewall as a Service - Python library
  network capabilities, including QoS, ACLs, and network monitoring.
  .
  This package provides the Python library for the Firewall as a Service agent.
-
-Package: neutron-fwaas-agent
-Architecture: all
-Pre-Depends: dpkg (>= 1.15.6~)
-Depends: adduser,
-         debconf,
-         lsb-base,
-         neutron-common,
-         ${misc:Depends},
-         ${python:Depends},
-         ${shlibs:Depends}
-Description: OpenStack Firewall as a Service - fwass agent
- Neutron provides an API to dynamically request and configure virtual networks.
- These networks connect "interfaces" from other OpenStack services (such as
- vNICs from Nova VMs). The Neutron API supports extensions to provide advanced
- network capabilities, including QoS, ACLs, and network monitoring.
- .
- This package provides the FWaaS agent.
