@@ -1,3 +1,9 @@
+neutron-fwaas (2015.1.0-2) unstable; urgency=medium
+
+  * Added --fail-missing for dh_install to avoid possible mistakes.
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 04 Jun 2015 16:00:26 +0200
+
 neutron-fwaas (2015.1.0-1) unstable; urgency=medium
 
   * New upstream release.

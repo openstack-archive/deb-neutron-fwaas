@@ -38,6 +38,9 @@ override_dh_clean:
 	find . -type f -name "*.pyc" -delete
 	rm -rf build
 
+override_dh_install:
+	dh_install --fail-missing
+
 # Commands not to run
 override_dh_installcatalogs:
 override_dh_installemacsen override_dh_installifupdown:
