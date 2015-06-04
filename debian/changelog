@@ -1,6 +1,7 @@
 neutron-fwaas (2015.1.0-2) unstable; urgency=medium
 
   * Added --fail-missing for dh_install to avoid possible mistakes.
+  * Packaging usr/etc/neutron/fwaas_driver.ini in /etc/neutron.
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 04 Jun 2015 16:00:26 +0200
 
