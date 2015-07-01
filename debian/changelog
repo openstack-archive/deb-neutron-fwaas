@@ -1,3 +1,9 @@
+neutron-fwaas (2015.1.0-3) unstable; urgency=medium
+
+  * Allow running with SQLAlchemy 1.0.6.
+
+ -- Thomas Goirand <zigo@debian.org>  Wed, 01 Jul 2015 02:59:03 +0000
+
 neutron-fwaas (2015.1.0-2) unstable; urgency=medium
 
   * Added --fail-missing for dh_install to avoid possible mistakes.
