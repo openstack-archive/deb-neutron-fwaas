@@ -1,3 +1,9 @@
+neutron-fwaas (2015.1.0-4) unstable; urgency=medium
+
+  * Also package Alembic migrations (Closes: #792590).
+
+ -- Thomas Goirand <zigo@debian.org>  Fri, 28 Aug 2015 09:01:58 +0000
+
 neutron-fwaas (2015.1.0-3) unstable; urgency=medium
 
   * Allow running with SQLAlchemy 1.0.6.
