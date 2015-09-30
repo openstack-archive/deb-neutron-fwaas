@@ -56,6 +56,11 @@ class IptablesFwaasTestCase(base.BaseTestCase):
                  'ip_version': 4,
                  'protocol': 'tcp',
                  'destination_port': '22'}
+        rule3 = {'enabled': True,
+                 'action': 'reject',
+                 'ip_version': 4,
+                 'protocol': 'tcp',
+                 'destination_port': '23'}
         ingress_chain = ('iv4%s' % fwid)[:11]
         egress_chain = ('ov4%s' % fwid)[:11]
         for router_info_inst in apply_list:
@@ -64,6 +69,7 @@ class IptablesFwaasTestCase(base.BaseTestCase):
             v4filter_inst.chains.append(egress_chain)
         rule_list.append(rule1)
         rule_list.append(rule2)
+        rule_list.append(rule3)
         return rule_list
 
     def _fake_firewall_no_rule(self):
@@ -93,7 +99,10 @@ class IptablesFwaasTestCase(base.BaseTestCase):
         apply_list = []
         while router_count > 0:
             iptables_inst = mock.Mock()
-            router_inst = {'distributed': distributed}
+            if distributed is not None:
+                router_inst = {'distributed': distributed}
+            else:
+                router_inst = {}
             v4filter_inst = mock.Mock()
             v6filter_inst = mock.Mock()
             v4filter_inst.chains = []
@@ -129,6 +138,7 @@ class IptablesFwaasTestCase(base.BaseTestCase):
         est_rule = '-m state --state ESTABLISHED,RELATED -j ACCEPT'
         rule1 = '-p tcp --dport 80  -s 10.24.4.2  -j ACCEPT'
         rule2 = '-p tcp --dport 22    -j DROP'
+        rule3 = '-p tcp --dport 23    -j REJECT'
         ingress_chain = 'iv4%s' % firewall['id']
         egress_chain = 'ov4%s' % firewall['id']
         bname = fwaas.iptables_manager.binary_name
@@ -151,6 +161,8 @@ class IptablesFwaasTestCase(base.BaseTestCase):
                      mock.call.add_rule(egress_chain, rule1),
                      mock.call.add_rule(ingress_chain, rule2),
                      mock.call.add_rule(egress_chain, rule2),
+                     mock.call.add_rule(ingress_chain, rule3),
+                     mock.call.add_rule(egress_chain, rule3),
                      mock.call.add_rule('FORWARD',
                                         '-o %s -j %s' % (if_prefix,
                                         ipt_mgr_ichain)),
@@ -203,6 +215,10 @@ class IptablesFwaasTestCase(base.BaseTestCase):
     def test_create_firewall_with_rules(self):
         self._setup_firewall_with_rules(self.firewall.create_firewall)
 
+    def test_create_firewall_with_rules_without_distributed_attr(self):
+        self._setup_firewall_with_rules(self.firewall.create_firewall,
+                                        distributed=None)
+
     def test_create_firewall_with_rules_two_routers(self):
         self._setup_firewall_with_rules(self.firewall.create_firewall,
                                         router_count=2)
@@ -210,8 +226,12 @@ class IptablesFwaasTestCase(base.BaseTestCase):
     def test_update_firewall_with_rules(self):
         self._setup_firewall_with_rules(self.firewall.update_firewall)
 
-    def test_delete_firewall(self):
-        apply_list = self._fake_apply_list()
+    def test_update_firewall_with_rules_without_distributed_attr(self):
+        self._setup_firewall_with_rules(self.firewall.update_firewall,
+                                        distributed=None)
+
+    def _test_delete_firewall(self, distributed=False):
+        apply_list = self._fake_apply_list(distributed=distributed)
         firewall = self._fake_firewall_no_rule()
         self.firewall.delete_firewall('legacy', apply_list, firewall)
         ingress_chain = 'iv4%s' % firewall['id']
@@ -220,6 +240,12 @@ class IptablesFwaasTestCase(base.BaseTestCase):
                  mock.call.remove_chain(egress_chain),
                  mock.call.remove_chain('fwaas-default-policy')]
         apply_list[0].iptables_manager.ipv4['filter'].assert_has_calls(calls)
+
+    def test_delete_firewall(self):
+        self._test_delete_firewall()
+
+    def test_delete_firewall_without_distributed_attr(self):
+        self._test_delete_firewall(distributed=None)
 
     def test_create_firewall_with_admin_down(self):
         apply_list = self._fake_apply_list()

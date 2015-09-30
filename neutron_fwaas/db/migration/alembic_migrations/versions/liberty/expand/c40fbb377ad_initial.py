@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-# Copyright 2011 OpenStack Foundation.
-# All Rights Reserved.
+# Copyright 2015 Red Hat Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -13,7 +11,24 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+#
 
-TOOLS=`dirname $0`
-VENV=$TOOLS/../.venv
-source $VENV/bin/activate && "$@"
+"""Initial Liberty no-op script.
+
+Revision ID: c40fbb377ad
+Revises: kilo
+Create Date: 2015-07-28 22:18:13.321233
+
+"""
+
+from neutron.db.migration import cli
+
+
+# revision identifiers, used by Alembic.
+revision = 'c40fbb377ad'
+down_revision = 'kilo'
+branch_labels = (cli.EXPAND_BRANCH,)
+
+
+def upgrade():
+    pass

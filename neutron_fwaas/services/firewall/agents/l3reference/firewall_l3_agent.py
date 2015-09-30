@@ -14,12 +14,12 @@
 #    under the License.
 
 from neutron.agent.linux import ip_lib
-from neutron.common import log
 from neutron.common import topics
 from neutron import context
 from neutron.i18n import _LE
 from neutron.plugins.common import constants
 from oslo_config import cfg
+from oslo_log import helpers as log_helpers
 from oslo_log import log as logging
 
 from neutron_fwaas.extensions import firewall as fw_ext
@@ -239,7 +239,7 @@ class FWaaSL3AgentRpcCallback(api.FWaaSAgentRpcCallbackMixin):
             LOG.exception(_LE("Failed fwaas process services sync"))
             self.services_sync_needed = True
 
-    @log.log
+    @log_helpers.log_method_call
     def create_firewall(self, context, firewall, host):
         """Handle Rpc from plugin to create a firewall."""
 
@@ -280,7 +280,7 @@ class FWaaSL3AgentRpcCallback(api.FWaaSAgentRpcCallbackMixin):
                 {'fwid': firewall['id']})
             self.services_sync_needed = True
 
-    @log.log
+    @log_helpers.log_method_call
     def update_firewall(self, context, firewall, host):
         """Handle Rpc from plugin to update a firewall."""
 
@@ -317,12 +317,13 @@ class FWaaSL3AgentRpcCallback(api.FWaaSAgentRpcCallbackMixin):
                         {'fwid': firewall['id']})
                     status = constants.ERROR
 
-            # the add
+        # handle the add router and/or rule, policy, firewall
+        # attribute updates
         if status not in (constants.ERROR, constants.INACTIVE):
             router_ids = self._get_router_ids_for_fw(context, firewall)
-            if router_ids:
+            if router_ids or firewall['router_ids']:
                 router_info_list = self._get_router_info_list_for_tenant(
-                    router_ids,
+                    router_ids + firewall['router_ids'],
                     firewall['tenant_id'])
                 LOG.debug("Update: Add firewall on Router List: '%s'",
                     [ri.router['id'] for ri in router_info_list])
@@ -342,7 +343,8 @@ class FWaaSL3AgentRpcCallback(api.FWaaSAgentRpcCallbackMixin):
                                   "%(fwid)s"),
                         {'fwid': firewall['id']})
                     status = constants.ERROR
-
+            else:
+                status = constants.INACTIVE
         try:
             # send status back to plugin
             self.fwplugin_rpc.set_firewall_status(
@@ -356,7 +358,7 @@ class FWaaSL3AgentRpcCallback(api.FWaaSAgentRpcCallbackMixin):
                 {'fwid': firewall['id']})
             self.services_sync_needed = True
 
-    @log.log
+    @log_helpers.log_method_call
     def delete_firewall(self, context, firewall, host):
         """Handle Rpc from plugin to delete a firewall."""
 
@@ -366,8 +368,10 @@ class FWaaSL3AgentRpcCallback(api.FWaaSAgentRpcCallbackMixin):
             router_info_list = self._get_router_info_list_for_tenant(
                 router_ids,
                 firewall['tenant_id'])
-            LOG.debug("Delete: Delete firewall on Router List: '%s'",
-                [ri.router['id'] for ri in router_info_list])
+            LOG.debug(
+                "Delete firewall %(fw)s on routers: '%(routers)s'"
+                % {'fw': firewall['id'],
+                   'routers': [ri.router['id'] for ri in router_info_list]})
             # call into the driver
             try:
                 self.fwaas_driver.delete_firewall(

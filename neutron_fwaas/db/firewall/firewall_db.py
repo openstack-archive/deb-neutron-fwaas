@@ -22,10 +22,10 @@ from neutron.db import model_base
 from neutron.db import models_v2
 from neutron.extensions import l3
 from neutron import manager
-from neutron.openstack.common import uuidutils
 from neutron.plugins.common import constants as p_const
 from oslo_config import cfg
 from oslo_log import log as logging
+from oslo_utils import uuidutils
 import sqlalchemy as sa
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy import orm
@@ -54,7 +54,8 @@ class FirewallRule(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     source_port_range_max = sa.Column(sa.Integer)
     destination_port_range_min = sa.Column(sa.Integer)
     destination_port_range_max = sa.Column(sa.Integer)
-    action = sa.Column(sa.Enum('allow', 'deny', name='firewallrules_action'))
+    action = sa.Column(sa.Enum('allow', 'deny', 'reject',
+                               name='firewallrules_action'))
     enabled = sa.Column(sa.Boolean)
     position = sa.Column(sa.Integer)
 
@@ -265,6 +266,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
         min_port, sep, max_port = port_range.partition(":")
         if not max_port:
             max_port = min_port
+        self._validate_fwr_port_range(min_port, max_port)
         return [int(min_port), int(max_port)]
 
     def _get_port_range_from_min_max_ports(self, min_port, max_port):
@@ -272,8 +274,21 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
             return None
         if min_port == max_port:
             return str(min_port)
-        else:
-            return '%d:%d' % (min_port, max_port)
+        self._validate_fwr_port_range(min_port, max_port)
+        return '%s:%s' % (min_port, max_port)
+
+    def _validate_fw_parameters(self, context, fw, fw_tenant_id):
+        if 'firewall_policy_id' not in fw:
+            return
+        fwp_id = fw['firewall_policy_id']
+        fwp = self._get_firewall_policy(context, fwp_id)
+        if fw_tenant_id != fwp['tenant_id'] and not fwp['shared']:
+            raise fw_ext.FirewallPolicyConflict(firewall_policy_id=fwp_id)
+
+    def _validate_fwr_port_range(self, min_port, max_port):
+        if int(min_port) > int(max_port):
+            port_range = '%s:%s' % (min_port, max_port)
+            raise fw_ext.FirewallRuleInvalidPortValue(port=port_range)
 
     def _validate_fwr_protocol_parameters(self, fwr):
         protocol = fwr['protocol']
@@ -294,6 +309,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
             status = (p_const.CREATED if cfg.CONF.router_distributed
                       else p_const.PENDING_CREATE)
         with context.session.begin(subtransactions=True):
+            self._validate_fw_parameters(context, fw, tenant_id)
             firewall_db = Firewall(
                 id=uuidutils.generate_uuid(),
                 tenant_id=tenant_id,
@@ -309,10 +325,26 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
         LOG.debug("update_firewall() called")
         fw = firewall['firewall']
         with context.session.begin(subtransactions=True):
+            fw_db = self.get_firewall(context, id)
+            self._validate_fw_parameters(context, fw, fw_db['tenant_id'])
             count = context.session.query(Firewall).filter_by(id=id).update(fw)
             if not count:
                 raise fw_ext.FirewallNotFound(firewall_id=id)
         return self.get_firewall(context, id)
+
+    def update_firewall_status(self, context, id, status, not_in=None):
+        """Conditionally update firewall status.
+
+        Status transition is performed only if firewall is not in the specified
+        states as defined by 'not_in' list.
+        """
+        # filter in_ wants iterable objects, None isn't.
+        not_in = not_in or []
+        with context.session.begin(subtransactions=True):
+            return (context.session.query(Firewall).
+                    filter(Firewall.id == id).
+                    filter(~Firewall.status.in_(not_in)).
+                    update({'status': status}, synchronize_session=False))
 
     def delete_firewall(self, context, id):
         LOG.debug("delete_firewall() called")
@@ -371,7 +403,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
             elif 'firewall_rules' in fwp:
                 self._set_rules_for_policy(context, fwp_db, fwp)
                 del fwp['firewall_rules']
-            if 'audited' not in fwp or fwp['audited']:
+            if 'audited' not in fwp:
                 fwp['audited'] = False
             fwp_db.update(fwp)
         return self._make_firewall_policy_dict(fwp_db)
@@ -410,7 +442,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
         self._validate_fwr_protocol_parameters(fwr)
         tenant_id = self._get_tenant_id_for_create(context, fwr)
         if not fwr['protocol'] and (fwr['source_port'] or
-                fwr['destination_port']):
+           fwr['destination_port']):
             raise fw_ext.FirewallRuleWithPortWithoutProtocolInvalid()
         src_port_min, src_port_max = self._get_min_max_ports_from_range(
             fwr['source_port'])

@@ -23,9 +23,9 @@ from neutron.agent.l3 import router_info
 from neutron.agent.linux import interface
 from neutron.common import config as base_config
 from neutron.common import constants as l3_constants
-from neutron.openstack.common import uuidutils
 from neutron_fwaas.services.firewall.agents.varmour import varmour_router
 from neutron_fwaas.tests import base
+from oslo_utils import uuidutils
 
 
 _uuid = uuidutils.generate_uuid
@@ -79,7 +79,7 @@ class TestVarmourRouter(base.BaseTestCase):
         mock.patch('neutron.agent.l3.agent.L3PluginApi').start()
 
         self.looping_call_p = mock.patch(
-            'neutron.openstack.common.loopingcall.FixedIntervalLoopingCall')
+            'oslo_service.loopingcall.FixedIntervalLoopingCall')
         self.looping_call_p.start()
         self.ri_kwargs = {'agent_conf': self.conf,
                           'interface_driver': self.mock_driver}

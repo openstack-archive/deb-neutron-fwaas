@@ -32,6 +32,10 @@ LOG = logging.getLogger(__name__)
 # Firewall rule action
 FWAAS_ALLOW = "allow"
 FWAAS_DENY = "deny"
+FWAAS_REJECT = "reject"
+
+# Firewall resource path prefix
+FIREWALL_PREFIX = "/fw"
 
 
 # Firewall Exceptions
@@ -54,6 +58,17 @@ class FirewallPolicyNotFound(nexception.NotFound):
 
 class FirewallPolicyInUse(nexception.InUse):
     message = _("Firewall Policy %(firewall_policy_id)s is being used.")
+
+
+class FirewallPolicyConflict(nexception.Conflict):
+    """FWaaS exception for firewall policy
+
+    Occurs when admin policy tries to use another tenant's unshared
+    policy.
+    """
+    message = _("Operation cannot be performed since Firewall Policy "
+                "%(firewall_policy_id)s is not shared and does not belong to "
+                "your tenant.")
 
 
 class FirewallRuleSharingConflict(nexception.Conflict):
@@ -113,7 +128,7 @@ class FirewallRuleWithPortWithoutProtocolInvalid(nexception.InvalidInput):
     message = _("Source/destination port requires a protocol")
 
 
-class FirewallInvalidPortValue(nexception.InvalidInput):
+class FirewallRuleInvalidPortValue(nexception.InvalidInput):
     message = _("Invalid value for port %(port)s.")
 
 
@@ -149,7 +164,7 @@ class FirewallRuleConflict(nexception.Conflict):
 fw_valid_protocol_values = [None, constants.PROTO_NAME_TCP,
                             constants.PROTO_NAME_UDP,
                             constants.PROTO_NAME_ICMP]
-fw_valid_action_values = [FWAAS_ALLOW, FWAAS_DENY]
+fw_valid_action_values = [FWAAS_ALLOW, FWAAS_DENY, FWAAS_REJECT]
 
 
 def convert_protocol(value):
@@ -229,10 +244,11 @@ RESOURCE_ATTRIBUTE_MAP = {
                       'required_by_policy': True,
                       'is_visible': True},
         'name': {'allow_post': True, 'allow_put': True,
-                 'validate': {'type:string': None},
+                 'validate': {'type:string': attr.NAME_MAX_LEN},
                  'is_visible': True, 'default': ''},
         'description': {'allow_post': True, 'allow_put': True,
-                        'validate': {'type:string': None},
+                        'validate': {'type:string':
+                                     attr.DESCRIPTION_MAX_LEN},
                         'is_visible': True, 'default': ''},
         'firewall_policy_id': {'allow_post': False, 'allow_put': False,
                                'validate': {'type:uuid_or_none': None},
@@ -283,10 +299,11 @@ RESOURCE_ATTRIBUTE_MAP = {
                       'required_by_policy': True,
                       'is_visible': True},
         'name': {'allow_post': True, 'allow_put': True,
-                 'validate': {'type:string': None},
+                 'validate': {'type:string': attr.NAME_MAX_LEN},
                  'is_visible': True, 'default': ''},
         'description': {'allow_post': True, 'allow_put': True,
-                        'validate': {'type:string': None},
+                        'validate': {'type:string':
+                                     attr.DESCRIPTION_MAX_LEN},
                         'is_visible': True, 'default': ''},
         'shared': {'allow_post': True, 'allow_put': True,
                    'default': False, 'convert_to': attr.convert_to_boolean,
@@ -309,10 +326,11 @@ RESOURCE_ATTRIBUTE_MAP = {
                       'required_by_policy': True,
                       'is_visible': True},
         'name': {'allow_post': True, 'allow_put': True,
-                 'validate': {'type:string': None},
+                 'validate': {'type:string': attr.NAME_MAX_LEN},
                  'is_visible': True, 'default': ''},
         'description': {'allow_post': True, 'allow_put': True,
-                        'validate': {'type:string': None},
+                        'validate': {'type:string':
+                                     attr.DESCRIPTION_MAX_LEN},
                         'is_visible': True, 'default': ''},
         'admin_state_up': {'allow_post': True, 'allow_put': True,
                            'default': True,

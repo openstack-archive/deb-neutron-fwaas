@@ -144,7 +144,10 @@ class CsrAclDriver(fwaas_base.FwaasDriverBase):
             ace_rule = {'sequence': str(seq)}
             seq += 1
 
-            ace_rule['protocol'] = rule['protocol']
+            if rule.get('protocol'):
+                ace_rule['protocol'] = rule['protocol']
+            else:
+                ace_rule['protocol'] = 'all'
 
             if rule['action'].lower() == 'allow':
                 ace_rule['action'] = 'permit'
@@ -165,7 +168,7 @@ class CsrAclDriver(fwaas_base.FwaasDriverBase):
             self._get_acl_l4_port('source_port', rule, l4_opt)
             self._get_acl_l4_port('destination_port', rule, l4_opt)
             if l4_opt:
-                ace_rule['L4-options'] = l4_opt
+                ace_rule['l4-options'] = l4_opt
 
             acl_rules_list.append(ace_rule)
 

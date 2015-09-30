@@ -14,7 +14,6 @@
 #    under the License.
 
 
-import contextlib
 import mock
 import neutron_fwaas.services.firewall.drivers.mcafee as mcafee
 import neutron_fwaas.services.firewall.drivers.mcafee.ngfw_fwaas as fwaas
@@ -138,57 +137,64 @@ class NGFWFwaasTestCase(base.BaseTestCase):
         ref_v4rule = self.tmp_ref + "/fw_ipv4_access_rule"
         ref_upload = self.tmp_ref + "/upload"
 
-        with contextlib.nested(
-                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'login'),
-                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'get'),
-                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'logout'),
-                mock.patch.object(
-                    mcafee.smc_api.SMCAPIConnection, 'post',
-                    return_value=self.post_return),
-        ) as (lg, get, logout, post):
-
-            expected = [mock.call(
-                'elements/fw_policy',
-                '{"name": "%s", "template": null}' % self.policy_name),
+        # NOTE(cbrandily): we replace jsonutils.dumps by identity in order
+        # to compare dictionaries instead of their json dumps and avoid to
+        # assume how jsonutils.dumps order dictionaries.
+        with mock.patch('oslo_serialization.jsonutils.dumps',
+                        side_effect=lambda x: x), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'login'), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'get'), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'logout'), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'post',
+                                  return_value=self.post_return) as post:
+            expected = [
                 mock.call(
-                'elements/udp_service',
-                '{"min_dst_port": 23, "max_dst_port": 23, '
-                '"name": "service-a2", "max_src_port": 23, '
-                '"min_src_port": 23}'),
+                    'elements/fw_policy',
+                    {"name": self.policy_name, "template": None}),
                 mock.call(
-                ref_v4rule,
-                '{"action": {"action": "discard", '
-                '"connection_tracking_options": {}}, '
-                '"services": {"service": ["%s"]}, "sources": '
-                '{"src": ["None"]}, "name": "a2", "destinations": '
-                '{"dst": ["None"]}}' % self.tmp_ref, raw=True),
+                    'elements/udp_service',
+                    {"min_dst_port": 23, "max_dst_port": 23,
+                     "name": "service-a2", "max_src_port": 23,
+                     "min_src_port": 23}),
                 mock.call(
-                'elements/network',
-                '{"ipv4_network": "192.168.100.0/24", '
-                '"name": "network-192.168.100.0/24"}'),
+                    ref_v4rule,
+                    {"action": {"action": "discard",
+                     "connection_tracking_options": {}},
+                     "services": {"service": [self.tmp_ref]},
+                     "sources": {"src": ["None"]},
+                     "name": "a2",
+                     "destinations": {"dst": ["None"]}},
+                    raw=True),
                 mock.call(
-                'elements/icmp_service',
-                '{"icmp_code": 0, "icmp_type": 0, "name": "service22"}'),
-                mock.call(ref_v4rule,
-                          '{"action": {"action": "discard", '
-                          '"connection_tracking_options": {}}, '
-                          '"services": {"service": ["%s"]}, '
-                          '"sources": {"src": ["%s"]}, "name": "a3", '
-                          '"destinations": {"dst": ["None"]}}' % (
-                              self.tmp_ref, self.tmp_ref), raw=True),
+                    'elements/network',
+                    {"ipv4_network": "192.168.100.0/24",
+                     "name": "network-192.168.100.0/24"}),
                 mock.call(
-                'elements/tcp_service',
-                '{"min_dst_port": 0, "max_dst_port": 65535, '
-                '"name": "service-a4", "max_src_port": 65535, '
-                '"min_src_port": 0}'),
+                    'elements/icmp_service',
+                    {"icmp_code": 0, "icmp_type": 0, "name": "service22"}),
                 mock.call(
-                ref_v4rule,
-                '{"action": {"action": "allow", '
-                '"connection_tracking_options": {}}, '
-                '"services": {"service": ["%s"]}, '
-                '"sources": {"src": ["None"]}, "name": "a4", '
-                '"destinations": {"dst": ["None"]}}' %
-                self.tmp_ref, raw=True),
+                    ref_v4rule,
+                    {"action": {"action": "discard",
+                     "connection_tracking_options": {}},
+                     "services": {"service": [self.tmp_ref]},
+                     "sources": {"src": [self.tmp_ref]},
+                     "name": "a3",
+                     "destinations": {"dst": ["None"]}},
+                    raw=True),
+                mock.call(
+                    'elements/tcp_service',
+                    {"min_dst_port": 0, "max_dst_port": 65535,
+                     "name": "service-a4", "max_src_port": 65535,
+                     "min_src_port": 0}),
+                mock.call(
+                    ref_v4rule,
+                    {"action": {"action": "allow",
+                     "connection_tracking_options": {}},
+                     "services": {"service": [self.tmp_ref]},
+                     "sources": {"src": ["None"]},
+                     "name": "a4",
+                     "destinations": {"dst": ["None"]}},
+                    raw=True),
                 mock.call(ref_upload, '', raw=True)]
 
             self.firewall.update_firewall('legacy', self.apply_list, firewall)
@@ -202,17 +208,15 @@ class NGFWFwaasTestCase(base.BaseTestCase):
 
         get_value = [{'result': [{'name': self.policy_name,
                                   'href': self.tmp_ref}, ]}, ]
-        with contextlib.nested(
-                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'login'),
-                mock.patch.object(
-                    mcafee.smc_api.SMCAPIConnection, 'get',
-                    return_value=get_value),
-                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'logout'),
-                mock.patch.object(
-                    mcafee.smc_api.SMCAPIConnection, 'post',
-                    return_value=self.post_return),
-                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'delete'),
-        ) as (lg, get, logout, post, delete):
+        with mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'login'), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'get',
+                                  return_value=get_value),\
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'logout'), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'post',
+                                  return_value=self.post_return), \
+                mock.patch.object(mcafee.smc_api.SMCAPIConnection, 'delete'
+                                  ) as delete:
+
             self.firewall.delete_firewall('legacy', self.apply_list, firewall)
 
             expected = [

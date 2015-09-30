@@ -13,7 +13,6 @@
 #    under the License.
 #
 
-import contextlib
 import mock
 
 from neutron.api.v2 import attributes as attr
@@ -21,6 +20,7 @@ from neutron import context
 from neutron import manager
 from neutron.plugins.common import constants as const
 from neutron.tests.unit.extensions import test_l3 as test_l3_plugin
+import six
 
 import neutron_fwaas
 from neutron_fwaas.db.cisco import cisco_fwaas_db as csrfw_db
@@ -73,7 +73,7 @@ class CSR1kvFirewallTestCaseBase(test_db_firewall.FirewallPluginDbTestCase,
         cfg.CONF.set_default('allow_overlapping_ips', True)
         cfg.CONF.set_default('max_routes', 3)
         self.saved_attr_map = {}
-        for resource, attrs in attr.RESOURCE_ATTRIBUTE_MAP.iteritems():
+        for resource, attrs in six.iteritems(attr.RESOURCE_ATTRIBUTE_MAP):
             self.saved_attr_map[resource] = attrs.copy()
         if not core_plugin:
             core_plugin = CORE_PLUGIN_KLASS
@@ -109,12 +109,20 @@ class CSR1kvFirewallTestCaseBase(test_db_firewall.FirewallPluginDbTestCase,
         self.restore_attribute_map()
         super(CSR1kvFirewallTestCaseBase, self).tearDown()
 
-    def _create_firewall(self, fmt, name, description, firewall_policy_id,
+    def _create_firewall(self, fmt, name, description, firewall_policy_id=None,
                          admin_state_up=True, expected_res_status=None,
                          **kwargs):
         tenant_id = kwargs.get('tenant_id', self._tenant_id)
         port_id = kwargs.get('port_id')
         direction = kwargs.get('direction')
+        if firewall_policy_id is None:
+            res = self._create_firewall_policy(fmt, 'fwp',
+                                               description="firewall_policy",
+                                               shared=True,
+                                               firewall_rules=[],
+                                               audited=True)
+            firewall_policy = self.deserialize(fmt or self.fmt, res)
+            firewall_policy_id = firewall_policy["firewall_policy"]["id"]
         data = {'firewall': {'name': name,
                              'description': description,
                              'firewall_policy_id': firewall_policy_id,
@@ -175,10 +183,8 @@ class TestCiscoFirewallPlugin(CSR1kvFirewallTestCaseBase,
 
     def test_create_csr_firewall(self):
 
-        with contextlib.nested(
-            self.router(tenant_id=self._tenant_id),
-            self.subnet(),
-        ) as (r, s):
+        with self.router(tenant_id=self._tenant_id) as r,\
+                self.subnet() as s:
 
             body = self._router_interface_action(
                 'add',
@@ -214,10 +220,8 @@ class TestCiscoFirewallPlugin(CSR1kvFirewallTestCaseBase,
 
     def test_create_csr_firewall_only_port_id_specified(self):
 
-        with contextlib.nested(
-            self.router(tenant_id=self._tenant_id),
-            self.subnet(),
-        ) as (r, s):
+        with self.router(tenant_id=self._tenant_id) as r, \
+                self.subnet() as s:
 
             body = self._router_interface_action(
                 'add',
@@ -268,10 +272,8 @@ class TestCiscoFirewallPlugin(CSR1kvFirewallTestCaseBase,
 
     def test_update_csr_firewall(self):
 
-        with contextlib.nested(
-            self.router(tenant_id=self._tenant_id),
-            self.subnet(),
-        ) as (r, s):
+        with self.router(tenant_id=self._tenant_id) as r, \
+                self.subnet() as s:
 
             body = self._router_interface_action(
                 'add',
@@ -325,11 +327,9 @@ class TestCiscoFirewallPlugin(CSR1kvFirewallTestCaseBase,
 
     def test_update_csr_firewall_port_id(self):
 
-        with contextlib.nested(
-            self.router(tenant_id=self._tenant_id),
-            self.subnet(),
-            self.subnet(cidr='20.0.0.0/24'),
-        ) as (r, s1, s2):
+        with self.router(tenant_id=self._tenant_id) as r, \
+                self.subnet() as s1, \
+                self.subnet(cidr='20.0.0.0/24') as s2:
 
             body = self._router_interface_action(
                 'add',
@@ -392,10 +392,9 @@ class TestCiscoFirewallPlugin(CSR1kvFirewallTestCaseBase,
 
     def test_delete_csr_firewall(self):
 
-        with contextlib.nested(
-            self.router(tenant_id=self._tenant_id),
-            self.subnet(),
-        ) as (r, s):
+        with self.router(tenant_id=self._tenant_id) as r, \
+                self.subnet() as s:
+
             body = self._router_interface_action(
                 'add',
                 r['router']['id'],

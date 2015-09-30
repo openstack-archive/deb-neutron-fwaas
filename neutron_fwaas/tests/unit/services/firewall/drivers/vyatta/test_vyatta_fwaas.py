@@ -13,14 +13,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import contextlib
 import sys
 
 import mock
-import urllib
 
-from neutron.openstack.common import uuidutils
 from neutron.tests import base
+from oslo_utils import uuidutils
+from six.moves.urllib import parse
 
 # Mocking imports of 3rd party vyatta library in unit tests and all modules
 # that depends on this library. Import will fail if not mocked and 3rd party
@@ -132,15 +131,12 @@ class VyattaFwaasTestCase(base.BaseTestCase):
         mock_api_gen = mock.Mock(return_value=mock_api)
         mock_get_firewall_rule = mock.Mock(return_value=[fake_rule_cmd])
         mock_get_zone_cmds = mock.Mock(return_value=fake_zone_configure_rules)
-        with contextlib.nested(
-                mock.patch.object(
-                    self.fwaas_driver, '_get_vyatta_client', mock_api_gen),
-                mock.patch.object(
-                    vyatta_fwaas.vyatta_utils, 'get_zone_cmds',
-                    mock_get_zone_cmds),
-                mock.patch.object(
-                    self.fwaas_driver, '_set_firewall_rule',
-                    mock_get_firewall_rule)):
+        with mock.patch.object(self.fwaas_driver, '_get_vyatta_client',
+                               mock_api_gen), \
+                mock.patch.object(vyatta_fwaas.vyatta_utils, 'get_zone_cmds',
+                                  mock_get_zone_cmds), \
+                mock.patch.object(self.fwaas_driver, '_set_firewall_rule',
+                                  mock_get_firewall_rule):
             self.fwaas_driver._setup_firewall(
                 fake_router_info, self.fake_firewall)
 
@@ -158,7 +154,7 @@ class VyattaFwaasTestCase(base.BaseTestCase):
                 vyatta_client.SetCmd(
                     vyatta_fwaas.FW_DESCRIPTION.format(
                         self.fake_firewall_name,
-                        urllib.quote_plus(self.fake_firewall['description']))),
+                        parse.quote_plus(self.fake_firewall['description']))),
                 vyatta_client.SetCmd(
                     vyatta_fwaas.FW_ESTABLISHED_ACCEPT),
                 vyatta_client.SetCmd(
@@ -204,8 +200,8 @@ class VyattaFwaasTestCase(base.BaseTestCase):
         cmds_expect = [
             vyatta_client.SetCmd(
                 vyatta_fwaas.FW_RULE_DESCRIPTION.format(
-                    urllib.quote_plus(fake_firewall_name), 1,
-                    urllib.quote_plus(fake_rule['description'])))
+                    parse.quote_plus(fake_firewall_name), 1,
+                    parse.quote_plus(fake_rule['description'])))
         ]
 
         rules = [
@@ -219,12 +215,12 @@ class VyattaFwaasTestCase(base.BaseTestCase):
         for key, url in rules:
             cmds_expect.append(vyatta_client.SetCmd(
                 url.format(
-                    urllib.quote_plus(fake_firewall_name), 1,
-                    urllib.quote_plus(fake_rule[key]))))
+                    parse.quote_plus(fake_firewall_name), 1,
+                    parse.quote_plus(fake_rule[key]))))
 
         cmds_expect.append(vyatta_client.SetCmd(
             vyatta_fwaas.FW_RULE_ACTION.format(
-                urllib.quote_plus(fake_firewall_name), 1,
+                parse.quote_plus(fake_firewall_name), 1,
                 action_map.get(fake_rule['action'], 'drop'))))
 
         self.assertEqual(cmds_expect, cmds_actual)

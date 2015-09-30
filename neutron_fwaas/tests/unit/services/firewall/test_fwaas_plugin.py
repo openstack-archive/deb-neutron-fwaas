@@ -13,9 +13,6 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-
-import contextlib
-
 import mock
 
 from neutron.api.v2 import attributes as attr
@@ -24,6 +21,7 @@ from neutron import manager
 from neutron.plugins.common import constants as const
 from neutron.tests.unit.extensions import test_l3 as test_l3_plugin
 from oslo_config import cfg
+import six
 from webob import exc
 
 import neutron_fwaas.extensions
@@ -74,7 +72,7 @@ class TestFirewallRouterInsertionBase(
 
         cfg.CONF.set_override('api_extensions_path', extensions_path)
         self.saved_attr_map = {}
-        for resource, attrs in attr.RESOURCE_ATTRIBUTE_MAP.iteritems():
+        for resource, attrs in six.iteritems(attr.RESOURCE_ATTRIBUTE_MAP):
             self.saved_attr_map[resource] = attrs.copy()
         if not fw_plugin:
             fw_plugin = FW_PLUGIN_KLASS
@@ -104,11 +102,19 @@ class TestFirewallRouterInsertionBase(
         self.restore_attribute_map()
         super(TestFirewallRouterInsertionBase, self).tearDown()
 
-    def _create_firewall(self, fmt, name, description, firewall_policy_id,
+    def _create_firewall(self, fmt, name, description, firewall_policy_id=None,
                          admin_state_up=True, expected_res_status=None,
                          **kwargs):
         tenant_id = kwargs.get('tenant_id', self._tenant_id)
         router_ids = kwargs.get('router_ids')
+        if firewall_policy_id is None:
+            res = self._create_firewall_policy(fmt, 'fwp',
+                                               description="firewall_policy",
+                                               shared=True,
+                                               firewall_rules=[],
+                                               audited=True)
+            firewall_policy = self.deserialize(fmt or self.fmt, res)
+            firewall_policy_id = firewall_policy["firewall_policy"]["id"]
         data = {'firewall': {'name': name,
                              'description': description,
                              'firewall_policy_id': firewall_policy_id,
@@ -207,15 +213,12 @@ class TestFirewallCallbacks(TestFirewallRouterInsertionBase):
     def test_get_firewall_for_tenant(self):
         tenant_id = 'test-tenant'
         ctx = context.Context('', tenant_id)
-        with contextlib.nested(self.firewall_rule(name='fwr1',
-                                                  tenant_id=tenant_id),
-                               self.firewall_rule(name='fwr2',
-                                                  tenant_id=tenant_id),
-                               self.firewall_rule(name='fwr3',
-                                                  tenant_id=tenant_id)
-                               ) as fr:
+        with self.firewall_rule(name='fwr1', tenant_id=tenant_id) as fwr1, \
+                self.firewall_rule(name='fwr2', tenant_id=tenant_id) as fwr2, \
+                self.firewall_rule(name='fwr3', tenant_id=tenant_id) as fwr3:
             with self.firewall_policy(tenant_id=tenant_id) as fwp:
                 fwp_id = fwp['firewall_policy']['id']
+                fr = [fwr1, fwr2, fwr3]
                 fw_rule_ids = [r['firewall_rule']['id'] for r in fr]
                 data = {'firewall_policy':
                         {'firewall_rules': fw_rule_ids}}
@@ -272,12 +275,8 @@ class TestFirewallAgentApi(base.BaseTestCase):
         self.assertEqual(self.api.host, 'host')
 
     def _call_test_helper(self, method_name):
-        with contextlib.nested(
-            mock.patch.object(self.api.client, 'cast'),
-            mock.patch.object(self.api.client, 'prepare'),
-        ) as (
-            rpc_mock, prepare_mock
-        ):
+        with mock.patch.object(self.api.client, 'cast') as rpc_mock, \
+                mock.patch.object(self.api.client, 'prepare') as prepare_mock:
             prepare_mock.return_value = self.api.client
             getattr(self.api, method_name)(mock.sentinel.context, 'test')
 
@@ -391,7 +390,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                     attrs = self._replace_firewall_status(attrs,
                                                       const.PENDING_CREATE,
                                                       const.PENDING_UPDATE)
-                    for k, v in attrs.iteritems():
+                    for k, v in six.iteritems(attrs):
                         self.assertEqual(res['firewall'][k], v)
 
     def test_update_firewall_fails_when_firewall_pending(self):
@@ -438,7 +437,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                     attrs = self._replace_firewall_status(attrs,
                                                       const.PENDING_CREATE,
                                                       const.PENDING_UPDATE)
-                    for k, v in attrs.iteritems():
+                    for k, v in six.iteritems(attrs):
                         self.assertEqual(res['firewall'][k], v)
 
     def test_update_firewall_shared_fails_for_non_admin(self):
@@ -540,10 +539,11 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
 
     def test_make_firewall_dict_with_in_place_rules(self):
         ctx = context.get_admin_context()
-        with contextlib.nested(self.firewall_rule(name='fwr1'),
-                               self.firewall_rule(name='fwr2'),
-                               self.firewall_rule(name='fwr3')) as fr:
+        with self.firewall_rule(name='fwr1') as fwr1, \
+                self.firewall_rule(name='fwr2') as fwr2, \
+                self.firewall_rule(name='fwr3') as fwr3:
             with self.firewall_policy() as fwp:
+                fr = [fwr1, fwr2, fwr3]
                 fwp_id = fwp['firewall_policy']['id']
                 fw_rule_ids = [r['firewall_rule']['id'] for r in fr]
                 data = {'firewall_policy':
@@ -581,3 +581,33 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                                description='fw') as fwalls:
                 self._test_list_resources('firewall', [fwalls],
                                           query_params='description=fw')
+
+    def test_insert_rule(self):
+        ctx = context.get_admin_context()
+        with self.firewall_rule() as fwr:
+            fr_id = fwr['firewall_rule']['id']
+            rule_info = {'firewall_rule_id': fr_id}
+            with self.firewall_policy() as fwp:
+                fwp_id = fwp['firewall_policy']['id']
+                with self.firewall(firewall_policy_id=fwp_id) as fw:
+                    fw_id = fw['firewall']['id']
+                    self.plugin.insert_rule(ctx, fwp_id, rule_info)
+                    fw_rules = self.plugin._make_firewall_dict_with_rules(
+                        ctx, fw_id)
+                    self.assertEqual(1, len(fw_rules['firewall_rule_list']))
+                    self.assertEqual(fr_id,
+                                     fw_rules['firewall_rule_list'][0]['id'])
+
+    def test_remove_rule(self):
+        ctx = context.get_admin_context()
+        with self.firewall_rule() as fwr:
+            fr_id = fwr['firewall_rule']['id']
+            rule_info = {'firewall_rule_id': fr_id}
+            with self.firewall_policy(firewall_rules=[fr_id]) as fwp:
+                fwp_id = fwp['firewall_policy']['id']
+                with self.firewall(firewall_policy_id=fwp_id) as fw:
+                    fw_id = fw['firewall']['id']
+                    self.plugin.remove_rule(ctx, fwp_id, rule_info)
+                    fw_rules = self.plugin._make_firewall_dict_with_rules(
+                        ctx, fw_id)
+                    self.assertEqual([], fw_rules['firewall_rule_list'])

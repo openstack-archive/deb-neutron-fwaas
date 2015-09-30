@@ -23,6 +23,10 @@ from neutron_fwaas.services.firewall.drivers import fwaas_base
 LOG = logging.getLogger(__name__)
 FWAAS_DRIVER_NAME = 'Fwaas iptables driver'
 FWAAS_DEFAULT_CHAIN = 'fwaas-default-policy'
+
+FWAAS_TO_IPTABLE_ACTION_MAP = {'allow': 'ACCEPT',
+                               'deny': 'DROP',
+                               'reject': 'REJECT'}
 INGRESS_DIRECTION = 'ingress'
 EGRESS_DIRECTION = 'egress'
 CHAIN_NAME_PREFIX = {INGRESS_DIRECTION: 'i',
@@ -73,7 +77,7 @@ class IptablesFwaasDriver(fwaas_base.FwaasDriverBase):
         namespace and a fip so this is provided back as a list - so in that
         scenario rules can be applied on both.
         """
-        if not router_info.router['distributed']:
+        if not router_info.router.get('distributed'):
             return [{'ipt': router_info.iptables_manager,
                      'if_prefix': INTERNAL_DEV_PREFIX}]
         ipt_mgrs = []
@@ -270,7 +274,8 @@ class IptablesFwaasDriver(fwaas_base.FwaasDriverBase):
         self._add_rules_to_chain(ipt_mgr, IPV6, 'FORWARD', jump_rule)
 
     def _convert_fwaas_to_iptables_rule(self, rule):
-        action = 'ACCEPT' if rule.get('action') == 'allow' else 'DROP'
+        action = FWAAS_TO_IPTABLE_ACTION_MAP[rule.get('action')]
+
         args = [self._protocol_arg(rule.get('protocol')),
                 self._port_arg('dport',
                                rule.get('protocol'),
