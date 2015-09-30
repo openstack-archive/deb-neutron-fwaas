@@ -1,3 +1,9 @@
+neutron-fwaas (1:7.0.0~rc1-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Thomas Goirand <zigo@debian.org>  Wed, 30 Sep 2015 09:13:47 +0200
+
 neutron-fwaas (2015.1.0-4) unstable; urgency=medium
 
   * Also package Alembic migrations (Closes: #792590).
