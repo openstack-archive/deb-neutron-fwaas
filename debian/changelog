@@ -1,3 +1,10 @@
+neutron-fwaas (1:7.0.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Uploading to unstable.
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 22 Oct 2015 09:25:53 +0000
+
 neutron-fwaas (1:7.0.0~rc1-1) experimental; urgency=medium
 
   * New upstream release.
