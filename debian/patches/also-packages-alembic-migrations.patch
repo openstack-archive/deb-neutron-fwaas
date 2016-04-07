@@ -1,15 +1,15 @@
-Description: Also packages Alembic migration scripts
- Thanks to Waldi for the bug report.
+Description: Also package migration scripts
 Author: Thomas Goirand <zigo@debian.org>
 Forwarded: no
-Last-Update: 2015-08-28
+Last-Update: 2016-04-07
 
---- neutron-fwaas-2015.1.0.orig/MANIFEST.in
-+++ neutron-fwaas-2015.1.0/MANIFEST.in
-@@ -7,6 +7,7 @@ include neutron/db/migration/alembic.ini
- include neutron/db/migration/alembic_migrations/script.py.mako
- include neutron/db/migration/alembic_migrations/versions/README
- recursive-include neutron/locale *
+--- neutron-fwaas-8.0.0.orig/MANIFEST.in
++++ neutron-fwaas-8.0.0/MANIFEST.in
+@@ -3,7 +3,7 @@ include README.rst
+ include ChangeLog
+ include LICENSE
+ include neutron_fwaas/db/migration/alembic_migrations/script.py.mako
+-recursive-include neutron_fwaas/db/migration/alembic_migrations/versions *
 +recursive-include neutron_fwaas/db *
  
  exclude .gitignore
