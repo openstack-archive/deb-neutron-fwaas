@@ -17,9 +17,9 @@ import requests
 
 from networking_cisco.plugins.cisco.cfg_agent.device_drivers import (
     cisco_csr_rest_client)
-from neutron.i18n import _LE
 from oslo_log import log as logging
 
+from neutron_fwaas._i18n import _LE
 from neutron_fwaas.services.firewall.drivers import fwaas_base
 
 
@@ -300,16 +300,16 @@ class CsrAclDriver(fwaas_base.FwaasDriverBase):
 
         acl_id = firewall['vendor_ext'].get('acl_id')
         if not acl_id:
-            LOG.error(_LE("firewal (%s) has no acl_id"), firewall['id'])
+            LOG.error(_LE("firewall (%s) has no acl_id"), firewall['id'])
             return False
 
         csr = self._get_csr_host(firewall['vendor_ext'])
         return self._delete_acl(csr, acl_id)
 
     def _update_firewall(self, firewall):
-        """Update ACL and associated interfacesr.
+        """Update ACL and associated interfaces.
 
-        :param firewall: firewall dictionry
+        :param firewall: firewall dictionary
         :return: True and status_data if OK
         :return: False and {} if there is an error
         """
@@ -321,7 +321,7 @@ class CsrAclDriver(fwaas_base.FwaasDriverBase):
 
         acl_id = firewall['vendor_ext'].get('acl_id')
         if not acl_id:
-            LOG.error(_LE("firewal (%s) has no acl_id"), firewall['id'])
+            LOG.error(_LE("firewall (%s) has no acl_id"), firewall['id'])
             return False, {}
 
         csr = self._get_csr_host(firewall['vendor_ext'])

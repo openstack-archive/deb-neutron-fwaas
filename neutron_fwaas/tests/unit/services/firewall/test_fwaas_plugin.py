@@ -19,6 +19,7 @@ from neutron.api.v2 import attributes as attr
 from neutron import context
 from neutron import manager
 from neutron.plugins.common import constants as const
+from neutron.tests import fake_notifier
 from neutron.tests.unit.extensions import test_l3 as test_l3_plugin
 from oslo_config import cfg
 import six
@@ -62,10 +63,8 @@ class TestFirewallRouterInsertionBase(
             create=True, new=test_db_firewall.FakeAgentApi().delete_firewall)
         self.agentapi_del_fw_p.start()
 
-        plugin = None
         # the plugin without L3 support
-        if not plugin:
-            plugin = 'neutron.tests.unit.extensions.test_l3.TestNoL3NatPlugin'
+        plugin = 'neutron.tests.unit.extensions.test_l3.TestNoL3NatPlugin'
         # the L3 service plugin
         l3_plugin = ('neutron.tests.unit.extensions.test_l3.'
                      'TestL3NatServicePlugin')
@@ -149,12 +148,12 @@ class TestFirewallCallbacks(TestFirewallRouterInsertionBase):
                                                          const.ACTIVE,
                                                          host='dummy')
                 fw_db = self.plugin.get_firewall(ctx, fw_id)
-                self.assertEqual(fw_db['status'], const.ACTIVE)
+                self.assertEqual(const.ACTIVE, fw_db['status'])
                 self.assertTrue(res)
                 res = self.callbacks.set_firewall_status(ctx, fw_id,
                                                          const.ERROR)
                 fw_db = self.plugin.get_firewall(ctx, fw_id)
-                self.assertEqual(fw_db['status'], const.ERROR)
+                self.assertEqual(const.ERROR, fw_db['status'])
                 self.assertFalse(res)
 
     def test_set_firewall_status_pending_delete(self):
@@ -173,7 +172,7 @@ class TestFirewallCallbacks(TestFirewallRouterInsertionBase):
                                                          const.ACTIVE,
                                                          host='dummy')
                 fw_db = self.plugin.get_firewall(ctx, fw_id)
-                self.assertEqual(fw_db['status'], const.PENDING_DELETE)
+                self.assertEqual(const.PENDING_DELETE, fw_db['status'])
                 self.assertFalse(res)
 
     def test_firewall_deleted(self):
@@ -208,7 +207,7 @@ class TestFirewallCallbacks(TestFirewallRouterInsertionBase):
                                                       host='dummy')
                 self.assertFalse(res)
                 fw_db = self.plugin._get_firewall(ctx, fw_id)
-                self.assertEqual(fw_db['status'], const.ERROR)
+                self.assertEqual(const.ERROR, fw_db['status'])
 
     def test_get_firewall_for_tenant(self):
         tenant_id = 'test-tenant'
@@ -240,7 +239,7 @@ class TestFirewallCallbacks(TestFirewallRouterInsertionBase):
                     )
                     fw_rules['add-router-ids'] = []
                     fw_rules['del-router-ids'] = []
-                    self.assertEqual(res[0], fw_rules)
+                    self.assertEqual(fw_rules, res[0])
                     self._compare_firewall_rule_lists(
                         fwp_id, fr, res[0]['firewall_rule_list'])
 
@@ -261,7 +260,7 @@ class TestFirewallCallbacks(TestFirewallRouterInsertionBase):
                     res = f(ctx, host='dummy')
                     for fw in res:
                         del fw['shared']
-                    self.assertEqual(res, fw_list)
+                    self.assertEqual(fw_list, res)
 
 
 class TestFirewallAgentApi(base.BaseTestCase):
@@ -271,8 +270,8 @@ class TestFirewallAgentApi(base.BaseTestCase):
         self.api = fwaas_plugin.FirewallAgentApi('topic', 'host')
 
     def test_init(self):
-        self.assertEqual(self.api.client.target.topic, 'topic')
-        self.assertEqual(self.api.host, 'host')
+        self.assertEqual('topic', self.api.client.target.topic)
+        self.assertEqual('host', self.api.host)
 
     def _call_test_helper(self, method_name):
         with mock.patch.object(self.api.client, 'cast') as rpc_mock, \
@@ -301,6 +300,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
 
     def setUp(self):
         super(TestFirewallPluginBase, self).setUp(fw_plugin=FW_PLUGIN_KLASS)
+        fake_notifier.reset()
 
     def tearDown(self):
         super(TestFirewallPluginBase, self).tearDown()
@@ -391,7 +391,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                                                       const.PENDING_CREATE,
                                                       const.PENDING_UPDATE)
                     for k, v in six.iteritems(attrs):
-                        self.assertEqual(res['firewall'][k], v)
+                        self.assertEqual(v, res['firewall'][k])
 
     def test_update_firewall_fails_when_firewall_pending(self):
         name = "new_firewall1"
@@ -438,7 +438,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                                                       const.PENDING_CREATE,
                                                       const.PENDING_UPDATE)
                     for k, v in six.iteritems(attrs):
-                        self.assertEqual(res['firewall'][k], v)
+                        self.assertEqual(v, res['firewall'][k])
 
     def test_update_firewall_shared_fails_for_non_admin(self):
         ctx = context.get_admin_context()
@@ -518,7 +518,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                 fw_id = fw['firewall']['id']
                 req = self.new_delete_request('firewalls', fw_id)
                 res = req.get_response(self.ext_api)
-                self.assertEqual(res.status_int, exc.HTTPNoContent.code)
+                self.assertEqual(exc.HTTPNoContent.code, res.status_int)
                 self.assertRaises(firewall.FirewallNotFound,
                                   self.plugin.get_firewall,
                                   ctx, fw_id)
@@ -532,7 +532,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                 fw_id = fw['firewall']['id']
                 req = self.new_delete_request('firewalls', fw_id)
                 res = req.get_response(self.ext_api)
-                self.assertEqual(res.status_int, exc.HTTPNoContent.code)
+                self.assertEqual(exc.HTTPNoContent.code, res.status_int)
                 self.assertRaises(firewall.FirewallNotFound,
                                   self.plugin.get_firewall,
                                   ctx, fw_id)
@@ -563,7 +563,7 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                         self.plugin._make_firewall_dict_with_rules(ctx,
                                                                    fw_id)
                     )
-                    self.assertEqual(fw_rules['id'], fw_id)
+                    self.assertEqual(fw_id, fw_rules['id'])
                     self._compare_firewall_rule_lists(
                         fwp_id, fr, fw_rules['firewall_rule_list'])
 
@@ -598,6 +598,20 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                     self.assertEqual(fr_id,
                                      fw_rules['firewall_rule_list'][0]['id'])
 
+    def test_insert_rule_notif(self):
+        ctx = context.get_admin_context()
+        with self.firewall_rule() as fwr:
+            fr_id = fwr['firewall_rule']['id']
+            rule_info = {'firewall_rule_id': fr_id}
+            with self.firewall_policy() as fwp:
+                fwp_id = fwp['firewall_policy']['id']
+                with self.firewall(firewall_policy_id=fwp_id):
+                    self.plugin.insert_rule(ctx, fwp_id, rule_info)
+            notifications = fake_notifier.NOTIFICATIONS
+            expected_event_type = 'firewall_policy.update.insert_rule'
+            event_types = [event['event_type'] for event in notifications]
+            self.assertIn(expected_event_type, event_types)
+
     def test_remove_rule(self):
         ctx = context.get_admin_context()
         with self.firewall_rule() as fwr:
@@ -611,3 +625,53 @@ class TestFirewallPluginBase(TestFirewallRouterInsertionBase,
                     fw_rules = self.plugin._make_firewall_dict_with_rules(
                         ctx, fw_id)
                     self.assertEqual([], fw_rules['firewall_rule_list'])
+
+    def test_remove_rule_notif(self):
+        ctx = context.get_admin_context()
+        with self.firewall_rule() as fwr:
+            fr_id = fwr['firewall_rule']['id']
+            rule_info = {'firewall_rule_id': fr_id}
+            with self.firewall_policy(firewall_rules=[fr_id]) as fwp:
+                fwp_id = fwp['firewall_policy']['id']
+                with self.firewall(firewall_policy_id=fwp_id):
+                    self.plugin.remove_rule(ctx, fwp_id, rule_info)
+            notifications = fake_notifier.NOTIFICATIONS
+            expected_event_type = 'firewall_policy.update.remove_rule'
+            event_types = [event['event_type'] for event in notifications]
+            self.assertIn(expected_event_type, event_types)
+
+    def test_firewall_quota_lower(self):
+        """Test quota using overridden value."""
+        cfg.CONF.set_override('quota_firewall', 3, group='QUOTAS')
+        with self.firewall(name='quota1'), \
+                self.firewall(name='quota2'), \
+                self.firewall(name='quota3'):
+            data = {'firewall': {'name': 'quota4',
+                                 'firewall_policy_id': None,
+                                 'tenant_id': self._tenant_id,
+                                 'shared': False}}
+            req = self.new_create_request('firewalls', data, 'json')
+            res = req.get_response(self.ext_api)
+            self.assertIn('Quota exceeded', res.body.decode('utf-8'))
+            self.assertEqual(exc.HTTPConflict.code, res.status_int)
+
+    def test_firewall_quota_default(self):
+        """Test quota using default value."""
+        with self.firewall(name='quota1'), \
+                self.firewall(name='quota2'), \
+                self.firewall(name='quota3'), \
+                self.firewall(name='quota4'), \
+                self.firewall(name='quota5'), \
+                self.firewall(name='quota6'), \
+                self.firewall(name='quota7'), \
+                self.firewall(name='quota8'), \
+                self.firewall(name='quota9'), \
+                self.firewall(name='quota10'):
+            data = {'firewall': {'name': 'quota11',
+                                 'firewall_policy_id': None,
+                                 'tenant_id': self._tenant_id,
+                                 'shared': False}}
+            req = self.new_create_request('firewalls', data, 'json')
+            res = req.get_response(self.ext_api)
+            self.assertIn('Quota exceeded', res.body.decode('utf-8'))
+            self.assertEqual(exc.HTTPConflict.code, res.status_int)

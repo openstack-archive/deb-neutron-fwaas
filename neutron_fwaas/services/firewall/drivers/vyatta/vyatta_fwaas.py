@@ -16,11 +16,11 @@
 from networking_brocade.vyatta.common import config as vyatta_config
 from networking_brocade.vyatta.vrouter import client as vyatta_client
 from neutron import context as neutron_context
-from neutron.i18n import _LW
 from novaclient import client as nova_client
 from oslo_log import log as logging
 from six.moves.urllib import parse
 
+from neutron_fwaas._i18n import _LW
 from neutron_fwaas.services.firewall.agents.vyatta import vyatta_utils
 from neutron_fwaas.services.firewall.drivers import fwaas_base
 
@@ -122,7 +122,7 @@ class VyattaFirewallDriver(fwaas_base.FwaasDriverBase):
                 rule_num += 1
                 fw_cmd_list += self._set_firewall_rule(fw_name, rule_num, rule)
             else:
-                LOG.warn(_LW("IPv6 rules are not supported."))
+                LOG.warning(_LW("IPv6 rules are not supported."))
 
         # Configure router zones
         zone_cmd_list = vyatta_utils.get_zone_cmds(client, ri, fw_name)

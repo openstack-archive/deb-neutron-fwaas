@@ -21,13 +21,15 @@
 
 import netaddr
 
-from neutron.common import constants
-from neutron_fwaas.services.firewall.drivers import fwaas_base
-import neutron_fwaas.services.firewall.drivers.mcafee.smc_api as smc_api
+from neutron_lib import constants
 from oslo_config import cfg
 from oslo_log import helpers as log_helpers
 from oslo_log import log as logging
 from oslo_serialization import jsonutils
+
+from neutron_fwaas._i18n import _
+from neutron_fwaas.services.firewall.drivers import fwaas_base
+from neutron_fwaas.services.firewall.drivers.mcafee import smc_api
 
 
 NGFWOpts = [
@@ -228,7 +230,7 @@ class NgfwFwaasDriver(fwaas_base.FwaasDriverBase):
             service_dict = {"service": [srv_ref]}
 
         elif rule['protocol'] is None:
-            # protocal "ANY" is translated to accept all, no service create
+            # protocol "ANY" is translated to accept all, no service create
             # here
             # TODO(yalie): add rules for different protocol, not ignore the
             # other value like ports.

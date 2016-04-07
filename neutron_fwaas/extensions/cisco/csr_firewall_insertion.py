@@ -16,9 +16,7 @@ from neutron.api import extensions
 from neutron.api.v2 import attributes as attr
 from neutron.common import exceptions as excp
 
-from oslo_log import log as logging
-
-LOG = logging.getLogger(__name__)
+from neutron_fwaas._i18n import _
 
 
 class InvalidInterfaceForCSRFW(excp.NotFound):

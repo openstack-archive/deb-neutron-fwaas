@@ -14,9 +14,9 @@
 #    under the License.
 
 from neutron.agent.linux import iptables_manager
-from neutron.i18n import _LE
 from oslo_log import log as logging
 
+from neutron_fwaas._i18n import _LE
 from neutron_fwaas.extensions import firewall as fw_ext
 from neutron_fwaas.services.firewall.drivers import fwaas_base
 
@@ -55,7 +55,7 @@ class IptablesFwaasDriver(fwaas_base.FwaasDriverBase):
         LOG.debug("Initializing fwaas iptables driver")
 
     def create_firewall(self, agent_mode, apply_list, firewall):
-        LOG.debug('Creating firewall %(fw_id)s for tenant %(tid)s)',
+        LOG.debug('Creating firewall %(fw_id)s for tenant %(tid)s',
                   {'fw_id': firewall['id'], 'tid': firewall['tenant_id']})
         try:
             if firewall['admin_state_up']:
@@ -93,7 +93,7 @@ class IptablesFwaasDriver(fwaas_base.FwaasDriverBase):
         return ipt_mgrs
 
     def delete_firewall(self, agent_mode, apply_list, firewall):
-        LOG.debug('Deleting firewall %(fw_id)s for tenant %(tid)s)',
+        LOG.debug('Deleting firewall %(fw_id)s for tenant %(tid)s',
                   {'fw_id': firewall['id'], 'tid': firewall['tenant_id']})
         fwid = firewall['id']
         try:
@@ -112,7 +112,7 @@ class IptablesFwaasDriver(fwaas_base.FwaasDriverBase):
             raise fw_ext.FirewallInternalDriverError(driver=FWAAS_DRIVER_NAME)
 
     def update_firewall(self, agent_mode, apply_list, firewall):
-        LOG.debug('Updating firewall %(fw_id)s for tenant %(tid)s)',
+        LOG.debug('Updating firewall %(fw_id)s for tenant %(tid)s',
                   {'fw_id': firewall['id'], 'tid': firewall['tenant_id']})
         try:
             if firewall['admin_state_up']:
@@ -125,7 +125,7 @@ class IptablesFwaasDriver(fwaas_base.FwaasDriverBase):
             raise fw_ext.FirewallInternalDriverError(driver=FWAAS_DRIVER_NAME)
 
     def apply_default_policy(self, agent_mode, apply_list, firewall):
-        LOG.debug('Applying firewall %(fw_id)s for tenant %(tid)s)',
+        LOG.debug('Applying firewall %(fw_id)s for tenant %(tid)s',
                   {'fw_id': firewall['id'], 'tid': firewall['tenant_id']})
         fwid = firewall['id']
         try:

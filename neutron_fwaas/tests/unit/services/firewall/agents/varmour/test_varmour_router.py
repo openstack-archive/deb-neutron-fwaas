@@ -22,9 +22,9 @@ from neutron.agent.l3 import ha
 from neutron.agent.l3 import router_info
 from neutron.agent.linux import interface
 from neutron.common import config as base_config
-from neutron.common import constants as l3_constants
 from neutron_fwaas.services.firewall.agents.varmour import varmour_router
 from neutron_fwaas.tests import base
+from neutron_lib import constants as l3_constants
 from oslo_utils import uuidutils
 
 
@@ -43,7 +43,6 @@ class TestVarmourRouter(base.BaseTestCase):
         self.conf.register_opts(ha.OPTS)
         agent_config.register_process_monitor_opts(self.conf)
         agent_config.register_interface_driver_opts_helper(self.conf)
-        agent_config.register_use_namespaces_opts_helper(self.conf)
         self.conf.register_opts(interface.OPTS)
         self.conf.set_override('interface_driver',
                                'neutron.agent.linux.interface.NullDriver')
@@ -200,4 +199,4 @@ class TestVarmourRouter(base.BaseTestCase):
         ri = self._prepare_router_data(enable_snat=True)
         router._router_added(ri.router['id'], ri.router)
         ri.router['enable_snat'] = False
-        self.assertEqual(ri.router['enable_snat'], False)
+        self.assertFalse(ri.router['enable_snat'])

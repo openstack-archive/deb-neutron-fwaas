@@ -17,8 +17,8 @@ import sys
 
 import mock
 
-from neutron.common import constants as l3_constants
 from neutron.tests import base
+from neutron_lib import constants as l3_constants
 from six.moves.urllib import parse
 
 # Mocking imports of 3rd party vyatta library in unit tests and all modules
@@ -53,7 +53,7 @@ class TestVyattaUtils(base.BaseTestCase):
         fw_name = vyatta_utils.get_firewall_name(
             None, fake_firewall)
 
-        self.assertEqual(fw_name, '74bc106dfff04f92ac1a60d4b6b4')
+        self.assertEqual('74bc106dfff04f92ac1a60d4b6b4', fw_name)
 
     def test_get_trusted_zone_name(self):
         fake_apply_list = object()

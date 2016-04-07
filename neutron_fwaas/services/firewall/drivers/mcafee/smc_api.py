@@ -27,10 +27,10 @@ import six
 
 from contextlib import contextmanager
 from neutron.common import exceptions as n_exc
-from neutron.i18n import _LE, _LI, _LW
 from oslo_log import log as logging
 from oslo_serialization import jsonutils
 
+from neutron_fwaas._i18n import _, _LE, _LI, _LW
 from neutron_fwaas.services.firewall.drivers.mcafee import constants as const
 
 LOG = logging.getLogger(__name__)
@@ -60,7 +60,7 @@ class SMCAPIConnection(object):
 
     For login/logout operation, users should set server IP, API version and
     auth key first. For get/put/delete operation, users should provide the
-    target element'path, and special json format data section followed "SMC
+    target element's path and special json format data section following "SMC
     API User's Guide".
     """
     def __init__(self, host, api_version, authentication_key):
@@ -281,7 +281,7 @@ class SMCAPIElement(object):
         json_result = self.get_elements()
 
         if not json_result[0]['result']:
-            LOG.warn(_LW("No #{element_type} defined in SMC"))
+            LOG.warning(_LW("No #{element_type} defined in SMC"))
         else:
             for element in json_result[0]['result']:
                 href = element['href']

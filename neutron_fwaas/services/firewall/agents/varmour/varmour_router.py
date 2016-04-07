@@ -28,14 +28,14 @@ from neutron.agent.linux import external_process
 from neutron.agent.linux import interface
 from neutron.agent.linux import ip_lib
 from neutron.common import config as common_config
-from neutron.common import constants as l3_constants
-from neutron.common import topics
-from neutron.i18n import _LW
 from neutron import service as neutron_service
+from neutron_lib import constants as l3_constants
 from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_service import service
 
+from neutron_fwaas._i18n import _, _LW
+from neutron_fwaas.common import fwaas_constants as f_const
 from neutron_fwaas.services.firewall.agents.l3reference \
     import firewall_l3_agent
 from neutron_fwaas.services.firewall.agents.varmour import varmour_api
@@ -102,8 +102,8 @@ class vArmourL3NATAgent(agent.L3NATAgent,
         if not ips:
             raise Exception(_("Router port %s has no IP address") % port['id'])
         if len(ips) > 1:
-            LOG.warn(_LW("Ignoring multiple IPs on router port %s"),
-                     port['id'])
+            LOG.warning(_LW("Ignoring multiple IPs on router port %s"),
+                        port['id'])
         prefixlen = netaddr.IPNetwork(port['subnet']['cidr']).prefixlen
         port['ip_cidr'] = "%s/%s" % (ips[0]['ip_address'], prefixlen)
 
@@ -285,10 +285,10 @@ class vArmourL3NATAgent(agent.L3NATAgent,
             try:
                 plist = resp['body']['response']
             except ValueError:
-                LOG.warn(_LW("Unable to parse interface mapping."))
+                LOG.warning(_LW("Unable to parse interface mapping."))
                 return
         else:
-            LOG.warn(_LW("Unable to read interface mapping."))
+            LOG.warning(_LW("Unable to read interface mapping."))
             return
 
         if ri.ex_gw_port:
@@ -333,7 +333,6 @@ def main():
     conf.register_opts(l3_config.OPTS)
     conf.register_opts(ha.OPTS)
     config.register_interface_driver_opts_helper(conf)
-    config.register_use_namespaces_opts_helper(conf)
     config.register_agent_state_opts_helper(conf)
     conf.register_opts(interface.OPTS)
     conf.register_opts(external_process.OPTS)
@@ -341,7 +340,7 @@ def main():
     config.setup_logging()
     server = neutron_service.Service.create(
         binary='neutron-l3-agent',
-        topic=topics.L3_AGENT,
+        topic=f_const.L3_AGENT,
         report_interval=cfg.CONF.AGENT.report_interval,
         manager='neutron_fwaas.services.firewall.agents.varmour.'
                 'varmour_router.vArmourL3NATAgentWithStateReport')

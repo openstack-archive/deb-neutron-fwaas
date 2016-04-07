@@ -18,13 +18,15 @@ import abc
 from neutron.api import extensions
 from neutron.api.v2 import attributes as attr
 from neutron.api.v2 import resource_helper
-from neutron.common import constants
 from neutron.common import exceptions as nexception
 from neutron.plugins.common import constants as p_const
 from neutron.services import service_base
+from neutron_lib import constants
 from oslo_config import cfg
 from oslo_log import log as logging
 import six
+
+from neutron_fwaas._i18n import _
 
 
 LOG = logging.getLogger(__name__)
@@ -136,6 +138,9 @@ class FirewallRuleInfoMissing(nexception.InvalidInput):
     message = _("Missing rule info argument for insert/remove "
                 "rule operation.")
 
+
+class FirewallIpAddressConflict(nexception.InvalidInput):
+    message = _("Invalid input - IP addresses do not agree with IP Version")
 
 # TODO(dougwig) - once this exception is out of neutron, restore this
 #class FirewallInternalDriverError(nexception.NeutronException):
@@ -348,13 +353,18 @@ RESOURCE_ATTRIBUTE_MAP = {
     },
 }
 
+# A tenant may have a unique firewall and policy for each router
+# when router insertion is used.
+# Set default quotas to align with default l3 quota_router of 10
+# though keep as separately controllable.
+
 firewall_quota_opts = [
     cfg.IntOpt('quota_firewall',
-               default=1,
+               default=10,
                help=_('Number of firewalls allowed per tenant. '
                       'A negative value means unlimited.')),
     cfg.IntOpt('quota_firewall_policy',
-               default=1,
+               default=10,
                help=_('Number of firewall policies allowed per tenant. '
                       'A negative value means unlimited.')),
     cfg.IntOpt('quota_firewall_rule',
@@ -398,7 +408,8 @@ class Firewall(extensions.ExtensionDescriptor):
         return resource_helper.build_resource_info(plural_mappings,
                                                    RESOURCE_ATTRIBUTE_MAP,
                                                    p_const.FIREWALL,
-                                                   action_map=action_map)
+                                                   action_map=action_map,
+                                                   register_quota=True)
 
     @classmethod
     def get_plugin_interface(cls):

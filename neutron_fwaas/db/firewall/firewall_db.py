@@ -16,13 +16,13 @@
 from neutron.callbacks import events
 from neutron.callbacks import registry
 from neutron.callbacks import resources
-from neutron.common import constants
 from neutron.db import common_db_mixin as base_db
 from neutron.db import model_base
 from neutron.db import models_v2
 from neutron.extensions import l3
 from neutron import manager
 from neutron.plugins.common import constants as p_const
+from neutron_lib import constants
 from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_utils import uuidutils
@@ -30,6 +30,8 @@ import sqlalchemy as sa
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy import orm
 from sqlalchemy.orm import exc
+
+import netaddr
 
 from neutron_fwaas.extensions import firewall as fw_ext
 
@@ -40,6 +42,7 @@ LOG = logging.getLogger(__name__)
 class FirewallRule(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     """Represents a Firewall rule."""
     __tablename__ = 'firewall_rules'
+    __table_args__ = ({'mysql_collate': 'utf8_bin'})
     name = sa.Column(sa.String(255))
     description = sa.Column(sa.String(1024))
     firewall_policy_id = sa.Column(sa.String(36),
@@ -63,6 +66,7 @@ class FirewallRule(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
 class Firewall(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     """Represents a Firewall resource."""
     __tablename__ = 'firewalls'
+    __table_args__ = ({'mysql_collate': 'utf8_bin'})
     name = sa.Column(sa.String(255))
     description = sa.Column(sa.String(1024))
     shared = sa.Column(sa.Boolean)
@@ -76,6 +80,7 @@ class Firewall(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
 class FirewallPolicy(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     """Represents a Firewall Policy resource."""
     __tablename__ = 'firewall_policies'
+    __table_args__ = ({'mysql_collate': 'utf8_bin'})
     name = sa.Column(sa.String(255))
     description = sa.Column(sa.String(1024))
     shared = sa.Column(sa.Boolean)
@@ -285,6 +290,18 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
         if fw_tenant_id != fwp['tenant_id'] and not fwp['shared']:
             raise fw_ext.FirewallPolicyConflict(firewall_policy_id=fwp_id)
 
+    def _validate_fwr_src_dst_ip_version(self, fwr):
+        src_version = dst_version = None
+        if fwr['source_ip_address']:
+            src_version = netaddr.IPNetwork(fwr['source_ip_address']).version
+        if fwr['destination_ip_address']:
+            dst_version = netaddr.IPNetwork(
+                fwr['destination_ip_address']).version
+        rule_ip_version = fwr['ip_version']
+        if ((src_version and src_version != rule_ip_version) or
+                (dst_version and dst_version != rule_ip_version)):
+            raise fw_ext.FirewallIpAddressConflict()
+
     def _validate_fwr_port_range(self, min_port, max_port):
         if int(min_port) > int(max_port):
             port_range = '%s:%s' % (min_port, max_port)
@@ -301,7 +318,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
     def create_firewall(self, context, firewall, status=None):
         LOG.debug("create_firewall() called")
         fw = firewall['firewall']
-        tenant_id = self._get_tenant_id_for_create(context, fw)
+        tenant_id = fw['tenant_id']
         # distributed routers may required a more complex state machine;
         # the introduction of a new 'CREATED' state allows this, whilst
         # keeping a backward compatible behavior of the logical resource.
@@ -374,10 +391,9 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
     def create_firewall_policy(self, context, firewall_policy):
         LOG.debug("create_firewall_policy() called")
         fwp = firewall_policy['firewall_policy']
-        tenant_id = self._get_tenant_id_for_create(context, fwp)
         with context.session.begin(subtransactions=True):
             fwp_db = FirewallPolicy(id=uuidutils.generate_uuid(),
-                                    tenant_id=tenant_id,
+                                    tenant_id=fwp['tenant_id'],
                                     name=fwp['name'],
                                     description=fwp['description'],
                                     shared=fwp['shared'])
@@ -440,7 +456,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
         LOG.debug("create_firewall_rule() called")
         fwr = firewall_rule['firewall_rule']
         self._validate_fwr_protocol_parameters(fwr)
-        tenant_id = self._get_tenant_id_for_create(context, fwr)
+        self._validate_fwr_src_dst_ip_version(fwr)
         if not fwr['protocol'] and (fwr['source_port'] or
            fwr['destination_port']):
             raise fw_ext.FirewallRuleWithPortWithoutProtocolInvalid()
@@ -451,7 +467,7 @@ class Firewall_db_mixin(fw_ext.FirewallPluginBase, base_db.CommonDbMixin):
         with context.session.begin(subtransactions=True):
             fwr_db = FirewallRule(
                 id=uuidutils.generate_uuid(),
-                tenant_id=tenant_id,
+                tenant_id=fwr['tenant_id'],
                 name=fwr['name'],
                 description=fwr['description'],
                 shared=fwr['shared'],

@@ -6,6 +6,7 @@ cover/
 covhtml/
 dist/
 doc/build
+etc/*.sample
 *.DS_Store
 *.pyc
 neutron.egg-info/
@@ -27,3 +28,6 @@ subunit.log
 !/.mailmap
 !/.pylintrc
 !/.testr.conf
+
+# Files created by releasenotes build
+releasenotes/build
