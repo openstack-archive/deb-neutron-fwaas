@@ -11,13 +11,18 @@ PYTHONS:=$(shell pyversions -vr)
 	dh $@ --buildsystem=python_distutils --with python2
 
 override_dh_auto_install:
-	set -e && for pyvers in $(PYTHONS); do \
+	set -e ; for pyvers in $(PYTHONS); do \
 		python$$pyvers setup.py install --install-layout=deb \
 			--root $(CURDIR)/debian/tmp; \
 	done
 
 override_dh_install:
-	dh_install -O--buildsystem=python_distutils --fail-missing -Xusr/etc/neutron/fwaas_driver.ini
+	mkdir -p $(CURDIR)/debian/python-neutron-fwaas/etc/neutron
+	PYTHONPATH=$(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages oslo-config-generator \
+		--output-file $(CURDIR)/debian/python-neutron-fwaas/etc/neutron/fwaas_driver.ini \
+		--wrap-width 140 \
+		--namespace firewall.agent
+	dh_install -O--buildsystem=python_distutils --fail-missing
 
 override_dh_auto_test:
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
