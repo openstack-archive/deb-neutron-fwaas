@@ -2,13 +2,13 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Neutron FWaaS
 Source: git://github.com/openstack/neutron-fwaas.git
 
-Files: debian/*
-Copyright: 2012-2013, Thomas Goirand <zigo@debian.org>
-License: Apache-2.0
-
 Files: *
 Copyright: (c) 2011-2012, OpenStack, LLC.
            (c) 2013-2014, The OpenStack Foundation
+License: Apache-2.0
+
+Files: debian/*
+Copyright: 2012-2016, Thomas Goirand <zigo@debian.org>
 License: Apache-2.0
 
 License: Apache-2.0
