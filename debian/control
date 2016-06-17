@@ -41,7 +41,7 @@ Build-Depends-Indep: alembic (>= 0.8.4),
                      python-webtest,
                      subunit,
                      testrepository,
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Homepage: https://github.com/openstack/neutron-fwaas
 Vcs-Browser: https://anonscm.debian.org/cgit/openstack/neutron-fwaas.git/
 Vcs-Git: https://anonscm.debian.org/git/openstack/neutron-fwaas.git
