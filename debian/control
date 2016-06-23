@@ -71,10 +71,42 @@ Depends: alembic (>= 0.8.4),
          ${python:Depends},
 Recommends: iputils-arping
 Provides: ${python:Provides}
-Description: OpenStack Firewall as a Service - Python library
+Description: OpenStack Firewall as a Service - Python 2.7 library
  Neutron provides an API to dynamically request and configure virtual networks.
  These networks connect "interfaces" from other OpenStack services (such as
  vNICs from Nova VMs). The Neutron API supports extensions to provide advanced
  network capabilities, including QoS, ACLs, and network monitoring.
  .
  This package provides the Python library for the Firewall as a Service agent.
+
+Package: neutron-fwaas-common
+Architecture: all
+Depends: neutron-common,
+         python-neutron-fwaas (= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends},
+         ${shlibs:Depends},
+Breaks: python-neutron-fwaas (<< 1:9.0.0~),
+Replaces: python-neutron-fwaas (<< 1:9.0.0~),
+Description: OpenStack Firewall as a Service - common files
+ Neutron provides an API to dynamically request and configure virtual networks.
+ These networks connect "interfaces" from other OpenStack services (such as
+ vNICs from Nova VMs). The Neutron API supports extensions to provide advanced
+ network capabilities, including QoS, ACLs, and network monitoring.
+ .
+ This package contains common files for the Neutron load balancer.
+
+Package: neutron-fwaas-l3-agent
+Architecture: all
+Depends: neutron-fwaas-common (= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends},
+         ${shlibs:Depends},
+Conflicts: neutron-l3-agent,
+Description: OpenStack Firewall as a Service - l3 agent
+ Neutron provides an API to dynamically request and configure virtual networks.
+ These networks connect "interfaces" from other OpenStack services (such as
+ vNICs from Nova VMs). The Neutron API supports extensions to provide advanced
+ network capabilities, including QoS, ACLs, and network monitoring.
+ .
+ This package contains the FWaaS l3 agent.

@@ -15,7 +15,7 @@ override_dh_auto_install:
 override_dh_install:
 	mkdir -p $(CURDIR)/debian/python-neutron-fwaas/etc/neutron
 	PYTHONPATH=$(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages oslo-config-generator \
-		--output-file $(CURDIR)/debian/python-neutron-fwaas/etc/neutron/fwaas_driver.ini \
+		--output-file $(CURDIR)/debian/neutron-fwaas-common/etc/neutron/fwaas_driver.ini \
 		--wrap-width 140 \
 		--namespace firewall.agent
 	dh_install -O--buildsystem=python_distutils --fail-missing
