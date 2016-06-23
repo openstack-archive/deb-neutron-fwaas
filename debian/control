@@ -103,7 +103,6 @@ Depends: neutron-fwaas-common (= ${source:Version}),
          ${misc:Depends},
          ${python:Depends},
          ${shlibs:Depends},
-Conflicts: neutron-l3-agent,
 Description: OpenStack Firewall as a Service - l3 agent
  Neutron provides an API to dynamically request and configure virtual networks.
  These networks connect "interfaces" from other OpenStack services (such as
