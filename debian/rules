@@ -18,7 +18,12 @@ override_dh_install:
 		--output-file $(CURDIR)/debian/neutron-fwaas-common/etc/neutron/fwaas_driver.ini \
 		--wrap-width 140 \
 		--namespace firewall.agent
+	# Enable the plugin by default
+	pkgos-fix-config-default $(CURDIR)/debian/neutron-fwaas-common/etc/neutron/fwaas_driver.ini fwaas driver neutron_fwaas.services.firewall.drivers.linux.iptables_fwaas.IptablesFwaasDriver
+	pkgos-fix-config-default $(CURDIR)/debian/neutron-fwaas-common/etc/neutron/fwaas_driver.ini fwaas enabled true
+
 	dh_install -O--buildsystem=python_distutils --fail-missing
+	# We don't want neutron-l3-agent to clash with the "normal" neutron-l3-agent
 	mv $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-l3-agent $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-fwaas-l3-agent
 
 override_dh_auto_test:
