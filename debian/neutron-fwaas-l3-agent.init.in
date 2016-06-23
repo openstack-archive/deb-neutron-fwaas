@@ -17,4 +17,4 @@ PROJECT_NAME=neutron
 NAME=${PROJECT_NAME}-fwaas-l3-agent
 # --config-file=/etc/neutron/neutron.conf will be happened 
 # to DAEMON_ARGS later by openstack-pkg-tools
-DAEMON_ARGS="--config-file=/etc/neutron/fwaas_driver.ini"
+DAEMON_ARGS="--config-file=/etc/neutron/l3_agent.ini --config-file=/etc/neutron/fwaas_driver.ini"

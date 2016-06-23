@@ -10,6 +10,7 @@ neutron-fwaas (1:9.0.0~b1-1) experimental; urgency=medium
   * Added a neutron-fwaas-l3-agent, holding the init script.
   * Renames $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-l3-agent as
     neutron-fwaas-l3-agent.
+  * Added Conflicts: neutron-l3-agent.
 
  -- Thomas Goirand <zigo@debian.org>  Fri, 17 Jun 2016 09:30:07 +0200
 
