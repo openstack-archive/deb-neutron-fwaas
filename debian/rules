@@ -19,6 +19,7 @@ override_dh_install:
 		--wrap-width 140 \
 		--namespace firewall.agent
 	dh_install -O--buildsystem=python_distutils --fail-missing
+	mv $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-l3-agent $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-fwaas-l3-agent
 
 override_dh_auto_test:
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
