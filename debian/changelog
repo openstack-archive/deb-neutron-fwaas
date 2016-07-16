@@ -1,5 +1,6 @@
-neutron-fwaas (1:9.0.0~b1-2) UNRELEASED; urgency=medium
+neutron-fwaas (1:9.0.0~b2-1) experimental; urgency=medium
 
+  * New upstream release.
   * Using HTTPS URL for upstream git.
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 16 Jul 2016 13:48:56 +0200
