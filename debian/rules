@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-UPSTREAM_GIT = git://github.com/openstack/neutron-fwaas.git
+UPSTREAM_GIT = https://github.com/openstack/neutron-fwaas.git
 include /usr/share/openstack-pkg-tools/pkgos.make
 
 %:
