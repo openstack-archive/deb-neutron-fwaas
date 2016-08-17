@@ -1,0 +1,10 @@
+Code-Review+2: Sridar Kandaswamy <skandasw@cisco.com>
+Code-Review+1: Brandon Logan <brandon.logan@rackspace.com>
+Code-Review+2: German Eichberger <german.eichberger@hp.com>
+Workflow+1: German Eichberger <german.eichberger@hp.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 09 Aug 2016 14:57:24 +0000
+Reviewed-on: https://review.openstack.org/339177
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
