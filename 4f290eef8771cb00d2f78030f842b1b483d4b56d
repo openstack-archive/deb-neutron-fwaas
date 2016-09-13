@@ -1,0 +1,11 @@
+Code-Review+2: Doug Wiegley <dougwig@parkside.io>
+Code-Review+1: vikram.choudhary <vikram.choudhary@huawei.com>
+Code-Review+1: YAMAMOTO Takashi <yamamoto@midokura.com>
+Code-Review+2: garyk <gkotton@vmware.com>
+Workflow+1: garyk <gkotton@vmware.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 14 Jun 2016 06:10:07 +0000
+Reviewed-on: https://review.openstack.org/328548
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/stable/mitaka
