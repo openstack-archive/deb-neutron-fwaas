@@ -1,0 +1,11 @@
+Code-Review+2: Armando Migliaccio <armamig@gmail.com>
+Code-Review+1: boden <bodenvmw@gmail.com>
+Code-Review+1: vikram.choudhary <vikram.choudhary@huawei.com>
+Code-Review+2: Nate Johnston <openstacknate@gmail.com>
+Workflow+1: Nate Johnston <openstacknate@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 23 Aug 2016 02:15:08 +0000
+Reviewed-on: https://review.openstack.org/354619
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master

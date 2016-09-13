@@ -1,0 +1,9 @@
+Code-Review+2: Nate Johnston <openstacknate@gmail.com>
+Code-Review+2: Ihar Hrachyshka <ihrachys@redhat.com>
+Workflow+1: Ihar Hrachyshka <ihrachys@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 29 Aug 2016 10:15:31 +0000
+Reviewed-on: https://review.openstack.org/361755
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
