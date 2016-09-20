@@ -27,6 +27,7 @@ down_revision = '4202e3047e47'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.engine import reflection
 
 SQL_STATEMENT = (
     "insert into firewall_router_associations "
@@ -34,7 +35,7 @@ SQL_STATEMENT = (
     "f.id as fw_id, r.id as router_id "
     "from firewalls f, routers r "
     "where "
-    "f.tenant_id=r.tenant_id"
+    "f.tenant_id=r.%s"
 )
 
 
@@ -49,4 +50,13 @@ def upgrade():
         sa.PrimaryKeyConstraint('fw_id', 'router_id'),
     )
 
-    op.execute(SQL_STATEMENT)
+    # Depending on when neutron-fwaas is installed with neutron, this script
+    # may be run before or after the neutron core tables have had their
+    # tenant_id columns renamed to project_id. Account for both scenarios.
+    bind = op.get_bind()
+    insp = reflection.Inspector.from_engine(bind)
+    columns = insp.get_columns('routers')
+    if 'tenant_id' in [c['name'] for c in columns]:
+        op.execute(SQL_STATEMENT % 'tenant_id')
+    else:
+        op.execute(SQL_STATEMENT % 'project_id')
