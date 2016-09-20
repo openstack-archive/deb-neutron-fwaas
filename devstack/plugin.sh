@@ -35,6 +35,7 @@ function install_fwaas() {
 
 function configure_fwaas() {
     neutron_fwaas_configure_driver
+    iniset_multiline $Q_L3_CONF_FILE AGENT extensions fwaas
 }
 
 function init_fwaas() {
@@ -57,14 +58,8 @@ function neutron_fwaas_configure_common {
 }
 
 function neutron_fwaas_configure_driver {
-    # Uses oslo config generator to generate FWaaS sample configuration files
-    (cd $NEUTRON_FWAAS_DIR && exec ./tools/generate_config_file_samples.sh)
-
-    cp $NEUTRON_FWAAS_DIR/etc/$FWAAS_DRIVER_CONF_FILENAME.sample $FWAAS_CONF_FILE
-
-    iniset_multiline $FWAAS_CONF_FILE fwaas enabled True
-    iniset_multiline $FWAAS_CONF_FILE fwaas driver $FWAAS_DRIVER
-    #iniset $NEUTRON_CONF DEFAULT service_plugins $Q_SERVICE_PLUGIN_CLASSES
+    iniset_multiline $Q_L3_CONF_FILE fwaas enabled True
+    iniset_multiline $Q_L3_CONF_FILE fwaas driver $FWAAS_DRIVER
 }
 
 # check for service enabled

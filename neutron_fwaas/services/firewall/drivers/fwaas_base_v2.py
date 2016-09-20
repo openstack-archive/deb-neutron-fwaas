@@ -1,4 +1,4 @@
-# Copyright 2013 Dell Inc.
+# Copyright (c) 2016
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -59,32 +59,7 @@ class FwaasDriverBase(object):
     application of rules. Argument agent_mode indicates the l3 agent in DVR or
     DVR_SNAT or LEGACY mode.
     """
-    # TODO(Margaret): Remove the first 3 methods and make the second three
-    # @abc.abstractmethod
-    def create_firewall(self, agent_mode, apply_list, firewall):
-        """Create the Firewall with default (drop all) policy.
-
-        The default policy will be applied on all the interfaces of
-        trusted zone.
-        """
-        pass
-
-    def delete_firewall(self, agent_mode, apply_list, firewall):
-        """Delete firewall.
-
-        Removes all policies created by this instance and frees up
-        all the resources.
-        """
-        pass
-
-    def update_firewall(self, agent_mode, apply_list, firewall):
-        """Apply the policy on all trusted interfaces.
-
-        Remove previous policy and apply the new policy on all trusted
-        interfaces.
-        """
-        pass
-
+    @abc.abstractmethod
     def create_firewall_group(self, agent_mode, apply_list, firewall):
         """Create the Firewall with default (drop all) policy.
 
@@ -93,6 +68,7 @@ class FwaasDriverBase(object):
         """
         pass
 
+    @abc.abstractmethod
     def delete_firewall_group(self, agent_mode, apply_list, firewall):
         """Delete firewall.
 
@@ -101,6 +77,7 @@ class FwaasDriverBase(object):
         """
         pass
 
+    @abc.abstractmethod
     def update_firewall_group(self, agent_mode, apply_list, firewall):
         """Apply the policy on all trusted interfaces.
 
