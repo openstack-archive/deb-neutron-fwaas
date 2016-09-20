@@ -23,8 +23,6 @@ override_dh_install:
 	pkgos-fix-config-default $(CURDIR)/debian/neutron-fwaas-common/etc/neutron/fwaas_driver.ini fwaas enabled true
 
 	dh_install -O--buildsystem=python_distutils --fail-missing
-	# We don't want neutron-l3-agent to clash with the "normal" neutron-l3-agent
-	mv $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-l3-agent $(CURDIR)/debian/python-neutron-fwaas/usr/bin/neutron-fwaas-l3-agent
 
 override_dh_auto_test:
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))

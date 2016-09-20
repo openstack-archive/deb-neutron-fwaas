@@ -16,24 +16,45 @@
 import mock
 
 from neutron_fwaas.services.firewall.agents import firewall_agent_api as api
-from neutron_fwaas.services.firewall.drivers import fwaas_base as base_driver
+from neutron_fwaas.services.firewall.drivers import fwaas_base
+from neutron_fwaas.services.firewall.drivers import fwaas_base_v2
 from neutron_fwaas.tests import base
 
 
-class NoopFwaasDriver(base_driver.FwaasDriverBase):
+class NoopFwaasDriver(fwaas_base.FwaasDriverBase):
     """Noop Fwaas Driver.
 
-    Firewall driver which does nothing.
+    v1 firewall driver which does nothing.
     This driver is for disabling Fwaas functionality.
     """
 
-    def create_firewall(self, agent_mode, apply_list, firewall):
+    def create_firewall_group(self, agent_mode, apply_list, firewall):
         pass
 
-    def delete_firewall(self, agent_mode, apply_list, firewall):
+    def delete_firewall_group(self, agent_mode, apply_list, firewall):
         pass
 
-    def update_firewall(self, agent_mode, apply_list, firewall):
+    def update_firewall_group(self, agent_mode, apply_list, firewall):
+        pass
+
+    def apply_default_policy(self, agent_mode, apply_list, firewall):
+        pass
+
+
+class NoopFwaasDriverV2(fwaas_base_v2.FwaasDriverBase):
+    """Noop Fwaas Driver.
+
+    v2 firewall driver which does nothing.
+    This driver is for disabling Fwaas functionality.
+    """
+
+    def create_firewall_group(self, agent_mode, apply_list, firewall):
+        pass
+
+    def delete_firewall_group(self, agent_mode, apply_list, firewall):
+        pass
+
+    def update_firewall_group(self, agent_mode, apply_list, firewall):
         pass
 
     def apply_default_policy(self, agent_mode, apply_list, firewall):
