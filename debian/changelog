@@ -8,6 +8,7 @@ neutron-fwaas (1:9.0.0~rc1-1) experimental; urgency=medium
   * Remove the neutron-fwaas-l3-agent init script, as this package is now just
     a plugin. Make the neutron-fwaas-l3-agent package a transition package.
   * d/s/options: extend-diff-ignore of .gitreview and egg-info
+  * Fixed oslotest EPOCH.
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 20 Sep 2016 14:29:06 +0200
 
