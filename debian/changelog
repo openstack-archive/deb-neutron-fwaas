@@ -1,6 +1,7 @@
-neutron-fwaas (1:9.0.0~rc1-1) experimental; urgency=medium
+neutron-fwaas (1:9.0.0~rc1-1) unstable; urgency=medium
 
   * New upstream release.
+  * Uploading to unstable.
   * Fixed (build-)depends for this release.
   * Using OpenStack's Gerrit as VCS URLs.
   * debian/python-neutron-fwaas.install: remove usr/bin/*, as there's now no
