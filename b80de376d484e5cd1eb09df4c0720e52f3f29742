@@ -1,0 +1,10 @@
+Code-Review+2: Nate Johnston <openstacknate@gmail.com>
+Code-Review+1: chandanc <chandanc@juniper.net>
+Code-Review+2: Sridar Kandaswamy <skandasw@cisco.com>
+Workflow+1: Sridar Kandaswamy <skandasw@cisco.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 12 Oct 2016 16:23:02 +0000
+Reviewed-on: https://review.openstack.org/384943
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
