@@ -1,0 +1,10 @@
+Code-Review+2: Nate Johnston <openstacknate@gmail.com>
+Code-Review+1: chandanc <chandanc@juniper.net>
+Code-Review+2: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Workflow+1: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 19 Oct 2016 07:14:19 +0000
+Reviewed-on: https://review.openstack.org/387398
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
