@@ -102,8 +102,8 @@ Description: OpenStack Firewall as a Service - common files
 
 Package: neutron-fwaas-l3-agent
 Architecture: all
-Conflicts: neutron-l3-agent,
 Depends: neutron-fwaas-common (= ${source:Version}),
+         neutron-l3-agent,
          ${misc:Depends},
          ${python:Depends},
          ${shlibs:Depends},

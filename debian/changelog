@@ -1,3 +1,10 @@
+neutron-fwaas (1:9.0.0-2) unstable; urgency=medium
+
+  * neutron-fwaas-l3-agent now runtime depends on neutron-l3-agent, to allow a
+    correct upgrade path.
+
+ -- Thomas Goirand <zigo@debian.org>  Fri, 04 Nov 2016 20:18:56 +0100
+
 neutron-fwaas (1:9.0.0-1) unstable; urgency=medium
 
   * New upstrem release.
