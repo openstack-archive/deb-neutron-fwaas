@@ -1,0 +1,10 @@
+Code-Review+2: Sridar Kandaswamy <skandasw@cisco.com>
+Code-Review+1: Margaret Frances <margaret_frances@cable.comcast.com>
+Code-Review+2: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Workflow+1: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sun, 13 Nov 2016 15:37:26 +0000
+Reviewed-on: https://review.openstack.org/391477
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
