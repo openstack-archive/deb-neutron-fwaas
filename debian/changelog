@@ -1,8 +1,9 @@
-neutron-fwaas (1:9.0.0-3) UNRELEASED; urgency=medium
+neutron-fwaas (1:9.0.0-3) unstable; urgency=medium
 
   * Bumped debhelper compat version to 10
+  * Patch-out upper constraints of SQLAlchemy
 
- -- Ondřej Nový <onovy@debian.org>  Thu, 24 Nov 2016 00:02:17 +0100
+ -- Ondřej Nový <onovy@debian.org>  Fri, 20 Jan 2017 11:45:11 +0100
 
 neutron-fwaas (1:9.0.0-2) unstable; urgency=medium
 
