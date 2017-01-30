@@ -1,0 +1,9 @@
+Code-Review+2: Nate Johnston <openstacknate@gmail.com>
+Code-Review+2: German Eichberger <German.eichberger@rackspace.com>
+Workflow+1: German Eichberger <German.eichberger@rackspace.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 27 Jan 2017 15:42:34 +0000
+Reviewed-on: https://review.openstack.org/426055
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
