@@ -1,0 +1,10 @@
+Code-Review+2: Ihar Hrachyshka <ihrachys@redhat.com>
+Code-Review+2: Armando Migliaccio <armamig@gmail.com>
+Workflow+1: Armando Migliaccio <armamig@gmail.com>
+Code-Review+1: Bertrand Lallau <bertrand.lallau@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 27 Feb 2017 23:05:43 +0000
+Reviewed-on: https://review.openstack.org/437968
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
