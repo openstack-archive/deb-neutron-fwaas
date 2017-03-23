@@ -1,0 +1,14 @@
+Code-Review+2: Armando Migliaccio <armamig@gmail.com>
+Code-Review+1: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Code-Review+1: wujun <wujun@awcloud.com>
+Code-Review+1: 黎岳衡 <liyh@awcloud.com>
+Code-Review+1: German Eichberger <German.eichberger@rackspace.com>
+Code-Review+1: Dariusz Smigiel <smigiel.dariusz@gmail.com>
+Code-Review+2: Ihar Hrachyshka <ihrachys@redhat.com>
+Workflow+1: Ihar Hrachyshka <ihrachys@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 10 Mar 2017 06:46:12 +0000
+Reviewed-on: https://review.openstack.org/427508
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/stable/newton

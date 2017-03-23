@@ -1,0 +1,10 @@
+Code-Review+1: Dariusz Smigiel <smigiel.dariusz@gmail.com>
+Code-Review+2: Armando Migliaccio <armamig@gmail.com>
+Code-Review+2: Brian Haley <haleyb.dev@gmail.com>
+Workflow+1: Brian Haley <haleyb.dev@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 10 Mar 2017 10:29:58 +0000
+Reviewed-on: https://review.openstack.org/436685
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/stable/newton
