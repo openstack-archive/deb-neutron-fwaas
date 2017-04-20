@@ -1,0 +1,10 @@
+Code-Review+2: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Code-Review+2: Kevin Benton <kevin@benton.pub>
+Code-Review+1: Cedric Brandily <zzelle@gmail.com>
+Workflow+1: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 20 Apr 2017 09:38:07 +0000
+Reviewed-on: https://review.openstack.org/438445
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
