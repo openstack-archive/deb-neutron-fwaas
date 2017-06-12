@@ -1,0 +1,10 @@
+Code-Review+1: Cao Xuan Hoang <hoangcx@vn.fujitsu.com>
+Code-Review+2: Yushiro FURUKAWA <y.furukawa_2@jp.fujitsu.com>
+Code-Review+2: German Eichberger <German.eichberger@rackspace.com>
+Workflow+1: German Eichberger <German.eichberger@rackspace.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 12 Jun 2017 15:16:16 +0000
+Reviewed-on: https://review.openstack.org/470154
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
