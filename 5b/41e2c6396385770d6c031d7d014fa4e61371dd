@@ -1,0 +1,9 @@
+Code-Review+2: Armando Migliaccio <armamig@gmail.com>
+Code-Review+2: German Eichberger <German.eichberger@rackspace.com>
+Workflow+1: German Eichberger <German.eichberger@rackspace.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 20 Jul 2017 00:32:20 +0000
+Reviewed-on: https://review.openstack.org/483370
+Project: openstack/deb-neutron-fwaas
+Branch: refs/heads/master
